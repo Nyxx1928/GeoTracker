@@ -137,9 +137,7 @@ GeoTracker/
 ├── .gitignore                 # Git ignore rules
 ├── package.json               # Backend dependencies
 ├── vercel.json                # Root deployment config
-├── README.md                  # This file
-├── DEPLOYMENT_GUIDE.md        # Detailed deployment instructions
-└── GITHUB_SETUP.md           # GitHub setup guide
+└── README.md                  # This file
 ```
 
 ---
@@ -181,8 +179,6 @@ Authenticates a user and returns a JWT token.
 - **Frontend**: [Add your Vercel frontend URL here]
 - **Backend**: [Add your Vercel backend URL here]
 
-For detailed deployment instructions, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
-
 ---
 
 ## 📝 Development Notes
@@ -191,13 +187,6 @@ For detailed deployment instructions, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUI
 - **Token Expiry**: JWT tokens expire after 1 hour
 - **Search History**: Limited to 10 items, stored in component state
 - **Map Provider**: Uses OpenStreetMap (free, no API key required)
-
----
-
-## 📚 Documentation
-
-- [Deployment Guide](./DEPLOYMENT_GUIDE.md) - Complete Vercel deployment instructions
-- [GitHub Setup Guide](./GITHUB_SETUP.md) - GitHub repository setup
 
 ---
 
