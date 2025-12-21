@@ -167,20 +167,6 @@ Authenticates a user and returns a JWT token.
 
 ---
 
-## 🌐 Deployment
-
-### GitHub Repository
-
-- **Status**: Public repository
-- **URL**: [Add your GitHub repository URL here]
-
-### Vercel Deployment
-
-- **Frontend**: [Add your Vercel frontend URL here]
-- **Backend**: [Add your Vercel backend URL here]
-
----
-
 ## 📝 Development Notes
 
 - **User Storage**: Currently uses in-memory storage. Replace with a database (MongoDB, PostgreSQL, etc.) for production.
