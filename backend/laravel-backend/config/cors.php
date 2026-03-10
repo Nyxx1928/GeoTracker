@@ -4,7 +4,9 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('FRONTEND_ORIGIN', 'http://localhost:3000')],
+    'allowed_origins' => [env('FRONTEND_ORIGIN', 'https://geo-tracker-eight-blond.vercel.app')],
+
+    'supports_credentials' => true,
     
     'allowed_origins_patterns' => [],
 
