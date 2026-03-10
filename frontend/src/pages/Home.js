@@ -107,7 +107,7 @@ export default function Home({ setIsLoggedIn }) {
   //   setIsLoggedIn(false);
   //   navigate('/login');
   // };
-  const habdleLogout = async () => {    
+  const handleLogout = async () => {
     try {
       await api.post('/api/logout');
     } finally {
