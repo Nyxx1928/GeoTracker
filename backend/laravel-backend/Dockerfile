@@ -5,7 +5,9 @@ RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip git libonig-dev libpng-dev libpq-dev \
     && docker-php-ext-install pdo pdo_mysql mbstring zip bcmath gd \
     && a2dismod mpm_event \
-    && a2enmod mpm_prefork rewrite headers
+    && a2enmod mpm_prefork rewrite headers \
+    && echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf \
+    && a2enconf servername
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
