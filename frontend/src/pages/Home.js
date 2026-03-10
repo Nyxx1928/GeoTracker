@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import api from '../api';
 
 export default function Home({ setIsLoggedIn }) {
   const navigate = useNavigate();
@@ -101,10 +102,18 @@ export default function Home({ setIsLoggedIn }) {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsLoggedIn(false);
-    navigate('/login');
+  // const handleLogout = () => {
+  //   localStorage.removeItem('token');
+  //   setIsLoggedIn(false);
+  //   navigate('/login');
+  // };
+  const habdleLogout = async () => {    
+    try {
+      await api.post('/api/logout');
+    } finally {
+      setIsLoggedIn(false);
+      navigate('/login');
+    }
   };
 
   return (
