@@ -8,12 +8,6 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function csrfToken(Request $request)
-    {
-        // Return the current CSRF token and set the XSRF-TOKEN cookie so frontend axios can use it
-        $token = csrf_token();
-        return response()->json(['csrf_token' => $token])->cookie('XSRF-TOKEN', $token, 0, '/');
-    }
 
     public function login(Request $request)
     {
