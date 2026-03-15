@@ -1,211 +1,116 @@
-# 🌍 GeoTracker
+# GeoTracker
 
-> A modern, full-stack IP geolocation tracking application built with React and Node.js
+GeoTracker is a full-stack IP geolocation app with a React frontend and a Laravel backend.
 
-[![React](https://img.shields.io/badge/React-19.2.3-61DAFB?logo=react)](https://reactjs.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js)](https://nodejs.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.1-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
-[![License](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
+The backend now uses Laravel 12 with session authentication via Sanctum (cookie + CSRF flow), not JWT.
 
-GeoTracker is a comprehensive web application that allows users to track and explore IP addresses worldwide. It features a secure authentication system, real-time geolocation data, interactive maps, and search history management.
+## Current Architecture
 
----
+- Frontend: React (Create React App), React Router, Axios, Tailwind CSS
+- Backend: Laravel 12, Sanctum, Eloquent, MySQL/PostgreSQL/SQLite via Laravel config
+- External data source: ipinfo.io (queried from the frontend)
+- Deployment: Railway config points to the Laravel Dockerfile and startup script
 
-## ✨ Features
+## Features
 
-### 🔐 Core Features
+- Login/logout using Laravel session auth
+- Authenticated session check via `/api/me`
+- IP lookup for IPv4 and IPv6
+- Interactive OpenStreetMap embed for searched IPs
+- Local in-app search history management (client-side)
 
-- **Secure Authentication** - JWT-based login system with bcrypt password hashing
-- **IP Geolocation** - Real-time location data for any IP address (IPv4 & IPv6)
-- **Interactive Maps** - Visual representation of IP locations using OpenStreetMap
-- **Search History** - Track and manage your IP search history
-- **IP Validation** - Comprehensive validation for both IPv4 and IPv6 addresses
+## Repository Layout
 
-### 🎯 Advanced Features
-
-- **History Management** - Bulk delete multiple search entries
-- **Quick Reload** - One-click reload of previous searches
-- **Responsive Design** - Modern dark theme UI with smooth animations
-- **Real-time Updates** - Instant geolocation data retrieval
-
----
-
-## 🛠️ Tech Stack
-
-### Frontend
-
-- **React 19.2.3** - UI framework
-- **React Router DOM 7.11.0** - Client-side routing
-- **Axios 1.13.2** - HTTP client
-- **Tailwind CSS 3.4.1** - Utility-first CSS framework
-
-### Backend
-
-- **Node.js** - Runtime environment
-- **Express 5.2.1** - Web framework
-- **JWT (jsonwebtoken 9.0.3)** - Authentication tokens
-- **bcryptjs 3.0.3** - Password hashing
-- **CORS 2.8.5** - Cross-origin resource sharing
-
-### External APIs
-
-- **IP Geolocation**: [ipinfo.io](https://ipinfo.io)
-- **Maps**: OpenStreetMap
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js (v14 or higher)
-- npm or yarn
-
-### Installation
-
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/GeoTracker.git
-   cd GeoTracker
-   ```
-
-2. **Install backend dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Install frontend dependencies**
-
-   ```bash
-   cd frontend
-   npm install
-   cd ..
-   ```
-
-4. **Start the backend server**
-
-   ```bash
-   node backend/server.js
-   ```
-
-   Backend runs on `http://localhost:8000`
-
-5. **Start the frontend (in a new terminal)**
-   ```bash
-   cd frontend
-   npm start
-   ```
-   Frontend runs on `http://localhost:3000`
-
----
-
-## 🔑 Default Credentials
-
-For testing purposes, use these credentials:
-
-```
-Email: test@example.com
-Password: password123
+```text
+JLabs3/
+|- backend/
+|  |- laravel-backend/       # Laravel application (API + auth)
+|- frontend/                 # React client
+|- railway.toml              # Railway root deploy config
 ```
 
-> ⚠️ **Note**: These are demo credentials. Change them in production!
+## Backend Endpoints
 
----
+- `GET /sanctum/csrf-cookie`
+  - Initializes CSRF cookie for session auth requests.
+- `POST /api/login`
+  - Logs in with email/password and creates a session.
+- `POST /api/logout`
+  - Logs out and invalidates session.
+- `GET /api/me`
+  - Returns authenticated user data (protected by `auth:sanctum`).
 
-## 📁 Project Structure
+## Local Development
 
-```
-GeoTracker/
-├── backend/
-│   ├── server.js              # Express server & API endpoints
-│   ├── seeders/
-│   │   └── userSeeder.js      # User seed data
-│   └── vercel.json            # Backend deployment config
-├── frontend/
-│   ├── src/
-│   │   ├── pages/
-│   │   │   ├── Login.js       # Login page component
-│   │   │   └── Home.js        # Main dashboard with IP tracking
-│   │   ├── App.js              # Root component with routing
-│   │   └── index.js            # Application entry point
-│   ├── public/
-│   ├── package.json
-│   ├── tailwind.config.js     # Tailwind CSS configuration
-│   └── vercel.json            # Frontend deployment config
-├── .gitignore                 # Git ignore rules
-├── package.json               # Backend dependencies
-├── vercel.json                # Root deployment config
-└── README.md                  # This file
-```
+## Prerequisites
 
----
+- PHP 8.4+
+- Composer
+- Node.js 18+
+- npm
+- A database supported by Laravel (SQLite, MySQL, or PostgreSQL)
 
-## 🔌 API Endpoints
+## 1) Backend setup (Laravel)
 
-### POST `/api/login`
-
-Authenticates a user and returns a JWT token.
-
-**Request:**
-
-```json
-{
-  "email": "test@example.com",
-  "password": "password123"
-}
+```bash
+cd backend/laravel-backend
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan db:seed
+php artisan serve
 ```
 
-**Response:**
+Backend default URL: `http://localhost:8000`
 
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
+## 2) Frontend setup (React)
+
+```bash
+cd frontend
+npm install
+npm start
 ```
 
----
+Frontend default URL: `http://localhost:3000`
 
-## 📝 Development Notes
+## 3) Frontend API base URL
 
-- **User Storage**: Currently uses in-memory storage. Replace with a database (MongoDB, PostgreSQL, etc.) for production.
-- **Token Expiry**: JWT tokens expire after 1 hour
-- **Search History**: Limited to 10 items, stored in component state
-- **Map Provider**: Uses OpenStreetMap (free, no API key required)
+The frontend uses `REACT_APP_API_URL`.
 
----
+- If unset, it defaults to `http://localhost:8000`.
+- To override, create `frontend/.env`:
 
-## 🤝 Contributing
+```bash
+REACT_APP_API_URL=http://localhost:8000
+```
 
-This is a project submission. For questions or issues, please contact the repository owner.
+## 4) CORS and credentials
 
----
+This project uses cookie-based auth across frontend/backend origins.
 
-## 📄 License
+- Backend CORS allows credentials.
+- Set `FRONTEND_ORIGIN` in backend `.env` to your frontend URL.
+- Make sure browser requests send credentials (already enabled in frontend Axios client).
 
-This project is licensed under the ISC License.
+## Demo User
 
----
+The Laravel seeder creates a default user:
 
-## 👤 Author
+- Email: `test@example.com`
+- Password: `password123`
 
-Created for JLabs3 assignment submission.
+## Deployment Notes
 
----
+- Root `railway.toml` builds from `backend/laravel-backend/Dockerfile`.
+- Start command is `/usr/local/bin/start.sh`.
+- Health check path is `/up`.
 
-## 🙏 Acknowledgments
+## Notes
 
-- [ipinfo.io](https://ipinfo.io) for geolocation API
-- [OpenStreetMap](https://www.openstreetmap.org) for map services
-- React and Node.js communities
+- Geolocation data is fetched from `https://ipinfo.io` in the frontend.
+- Search history is currently stored in client state (not persisted in backend).
 
----
+## License
 
-## 📧 Contact
-
-For questions or support, please open an issue on GitHub.
-
----
-
-**Made with ❤️ using React and Node.js**
+Project license remains as configured in the repository.
