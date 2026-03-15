@@ -9,36 +9,20 @@ export default function Login({ setIsLoggedIn }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // const handleLogin = async (e) => {
-  //   e.preventDefault();
-  //   setError('');
-  //   setLoading(true);
-
-  //   try {
-  //     const res = await axios.post('http://localhost:8000/api/login', { email, password });
-  //     localStorage.setItem('token', res.data.token);
-  //     setIsLoggedIn(true);
-  //     navigate('/home');
-  //   } catch (err) {
-  //     setError('Invalid credentials. Please try again.');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
+
     try {
-      //await api.get('/api/csrf-token');
-      await api.get('/sanctum/csrf-cookie'); // prime the CSRF cookie (Sanctum built-in)
-      await api.post('/api/login', { email, password }); // sets session cookie
+      //initialize CSRF cookie (Sanctum)
+      await api.get('/sanctum/csrf-cookie');
+      //then post credentials; Laravel will set session cookie
+      await api.post('/api/login', { email, password});
       setIsLoggedIn(true);
       navigate('/home');
-    } catch {
-      setError('Invalid credentials. Please try again.');
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      setError('Invalid credentials, Please try again.');
     }
   };
 
