@@ -102,11 +102,6 @@ export default function Home({ setIsLoggedIn }) {
     }
   };
 
-  // const handleLogout = () => {
-  //   localStorage.removeItem('token');
-  //   setIsLoggedIn(false);
-  //   navigate('/login');
-  // };
   const handleLogout = async () => {
     try {
       await api.post('/api/logout');
