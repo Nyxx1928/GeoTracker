@@ -18,5 +18,8 @@ php artisan view:cache
 # Run database migrations automatically
 php artisan migrate --force
 
+# Seed the database (idempotent)
+php artisan db:seed --force
+
 echo "==> Starting Apache..."
 exec apache2-foreground
