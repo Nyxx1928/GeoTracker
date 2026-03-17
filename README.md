@@ -90,7 +90,16 @@ REACT_APP_API_URL=http://localhost:8000
 This project uses cookie-based auth across frontend/backend origins.
 
 - Backend CORS allows credentials.
-- Set `FRONTEND_ORIGIN` in backend `.env` to your frontend URL.
+- Set backend `.env` origins explicitly:
+
+```bash
+FRONTEND_ORIGINS=http://localhost:3000,https://geo-tracker-eight-blond.vercel.app
+FRONTEND_ORIGIN_PATTERNS=
+```
+
+- `FRONTEND_ORIGINS` is a comma-separated allowlist.
+- `FRONTEND_ORIGIN_PATTERNS` is optional for regex patterns (for example Vercel previews).
+- `FRONTEND_ORIGIN` is still supported as a backward-compatible fallback.
 - Make sure browser requests send credentials (already enabled in frontend Axios client).
 
 ## Demo User
