@@ -10,7 +10,10 @@ if command -v a2dismod >/dev/null 2>&1; then
 	a2enmod mpm_prefork >/dev/null 2>&1 || true
 fi
 
-# Cache config, routes, and views for performance
+# Clear any stale cached config baked into the image, then rebuild from env
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
