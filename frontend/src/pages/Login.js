@@ -15,14 +15,14 @@ export default function Login({ setIsLoggedIn }) {
     setLoading(true);
 
     try {
-      //initialize CSRF cookie (Sanctum)
-      await api.get('/sanctum/csrf-cookie');
-      //then post credentials; Laravel will set session cookie
-      await api.post('/api/login', { email, password});
+      const res = await api.post('/api/login', { email, password });
+      localStorage.setItem('auth_token', res.data.token);
       setIsLoggedIn(true);
       navigate('/home');
     } catch (err) {
       setError('Invalid credentials, Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 

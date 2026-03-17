@@ -106,6 +106,7 @@ export default function Home({ setIsLoggedIn }) {
     try {
       await api.post('/api/logout');
     } finally {
+      localStorage.removeItem('auth_token');
       setIsLoggedIn(false);
       navigate('/login');
     }

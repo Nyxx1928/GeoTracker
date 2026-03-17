@@ -9,16 +9,18 @@ function App() {
 
   useEffect(() => {
     const checkSession = async () => {
+      const token = localStorage.getItem('auth_token');
+      if (!token) { setIsLoggedIn(false); return; }
       try {
         const res = await api.get('/api/me');
         if (res.data?.authenticated) setIsLoggedIn(true);
-        else setIsLoggedIn(false);
+        else { localStorage.removeItem('auth_token'); setIsLoggedIn(false); }
       } catch {
+        localStorage.removeItem('auth_token');
         setIsLoggedIn(false);
       }
     };
     checkSession();
-
   }, []);
 
 
