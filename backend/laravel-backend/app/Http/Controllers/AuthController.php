@@ -22,9 +22,19 @@ class AuthController extends Controller
             ]);
         }
 
-        $request->session()->regenerate();
+        $user = Auth::user();
+        // Revoke all previous tokens before issuing a new one
+        $user->tokens()->delete();
+        $token = $user->createToken('auth-token')->plainTextToken;
 
-        return response()->json([ 'message' => 'Logged in' ]);
+        return response()->json([
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
+        ]);
     }
 
     public function me(Request $request)
@@ -43,9 +53,8 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // Revoke the token used for this request
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Logged out']);
     }

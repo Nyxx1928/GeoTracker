@@ -3,8 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
-/**
- * Protected API route for authenticated user info.
- * Uses Sanctum's token/session guard via the auth:sanctum middleware.
- */
-Route::middleware('auth:sanctum')->get('/me', [AuthController::class, 'me']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});

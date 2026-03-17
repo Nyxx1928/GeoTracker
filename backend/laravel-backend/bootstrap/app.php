@@ -12,16 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->statefulApi();
-
-        // Exclude XSRF-TOKEN from encryption so axios can read it as plain text
-        $middleware->encryptCookies(except: ['XSRF-TOKEN']);
-
-        // Login/logout don't need CSRF — credentials authenticate them, not session state
-        $middleware->validateCsrfTokens(except: [
-            'api/login',
-            'api/logout',
-        ]);
+        // Token-based auth — no session or CSRF middleware needed
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
