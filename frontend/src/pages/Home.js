@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import GeoMap from '../components/GeoMap';
 
 export default function Home({ setIsLoggedIn }) {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ export default function Home({ setIsLoggedIn }) {
 
   const fetchUserGeo = async () => {
     try {
-      const res = await axios.get('https://ipinfo.io/geo');
+      const res = await api.get('/api/geo');
       setUserGeo(res.data);
       setCurrentGeo(res.data);
     } catch (err) {
@@ -35,39 +35,31 @@ export default function Home({ setIsLoggedIn }) {
       return;
     }
     const ip = String(ipToSearch || searchIp || '').trim();
-    if (!ip) {
-      setError('Please enter an IP address');
-      return;
-    }
+    if (!ip) { setError('Please enter an IP address'); return; }
     setError('');
     setLoading(true);
 
     const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
     const ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]+|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/i;
 
-    const isValid = ipv4Regex.test(ip) || ipv6Regex.test(ip);
-    if (!isValid) {
-      setError('Invalid IP address format. Please enter a valid IPv4 or IPv6 address.');
+    if (!ipv4Regex.test(ip) && !ipv6Regex.test(ip)) {
+      setError('Invalid IP address format.');
       setLoading(false);
       return;
     }
 
     try {
-      const res = await axios.get(`https://ipinfo.io/${ip}/geo`);
-      if (res.data && res.data.loc) {
+      const res = await api.get(`/api/geo/${ip}`);
+      if (res.data && res.data.status === 'success') {
         setCurrentGeo(res.data);
         setHistory(prev => [...new Set([ip, ...prev])].slice(0, 10));
         setError('');
         setSearchIp(ip);
       } else {
-        setError('Location data not available for this IP address');
+        setError(res.data?.message || 'Location data not available for this IP address');
       }
     } catch (err) {
-      if (err.response && err.response.status === 404) {
-        setError('IP address not found or invalid');
-      } else {
-        setError('Failed to fetch geolocation. Please try again.');
-      }
+      setError('Failed to fetch geolocation. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -146,7 +138,7 @@ export default function Home({ setIsLoggedIn }) {
             <div className="space-y-4">
               <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
                 <p className="text-xs text-cyan-400 mb-1 font-medium">IP Address</p>
-                <p className="text-lg font-mono font-semibold text-white">{currentGeo.ip}</p>
+                <p className="text-lg font-mono font-semibold text-white">{currentGeo.query}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
@@ -155,7 +147,7 @@ export default function Home({ setIsLoggedIn }) {
                 </div>
                 <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
                   <p className="text-xs text-gray-400 mb-1 font-medium">Region</p>
-                  <p className="text-base font-semibold text-white">{currentGeo.region || 'N/A'}</p>
+                  <p className="text-base font-semibold text-white">{currentGeo.regionName || 'N/A'}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -165,49 +157,20 @@ export default function Home({ setIsLoggedIn }) {
                 </div>
                 <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
                   <p className="text-xs text-gray-400 mb-1 font-medium">Coordinates</p>
-                  <p className="text-sm font-mono text-cyan-300">{currentGeo.loc || 'N/A'}</p>
+                  <p className="text-sm font-mono text-cyan-300">
+                    {currentGeo.lat != null ? `${currentGeo.lat}, ${currentGeo.lon}` : 'N/A'}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {currentGeo.loc && currentGeo.loc.includes(',') && (
-              <div key={currentGeo.loc} className="space-y-3">
+            {currentGeo.lat != null && currentGeo.lon != null && (
+              <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xl">🗺️</span>
                   <h3 className="text-lg font-semibold text-white">Interactive Map</h3>
                 </div>
-                <div className="w-full h-64 sm:h-80 rounded-xl overflow-hidden border border-gray-700 shadow-lg shadow-cyan-900/20">
-                  {(() => {
-                    const [lat, lon] = currentGeo.loc.split(',').map(Number);
-                    const zoom = 0.15;
-                    return (
-                      <iframe
-                        width="100%"
-                        height="100%"
-                        frameBorder="0"
-                        scrolling="no"
-                        marginHeight="0"
-                        marginWidth="0"
-                        title={`Map for ${currentGeo.ip}`}
-                        src={`https://www.openstreetmap.org/export/embed.html?bbox=${lon - zoom},${lat - zoom},${lon + zoom},${lat + zoom}&layer=mapnik&marker=${lat},${lon}`}
-                      />
-                    );
-                  })()}
-                </div>
-                {(() => {
-                  const [lat, lon] = currentGeo.loc.split(',').map(Number);
-                  return (
-                    <a
-                      href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}&zoom=12`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
-                    >
-                      <span>🔗</span>
-                      <span>View Larger Map</span>
-                    </a>
-                  );
-                })()}
+                <GeoMap lat={currentGeo.lat} lon={currentGeo.lon} />
               </div>
             )}
           </div>
