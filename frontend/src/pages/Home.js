@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import GeoMap from '../components/GeoMap';
+import MapErrorBoundary from '../components/MapErrorBoundary';
 
 export default function Home({ setIsLoggedIn }) {
   const navigate = useNavigate();
@@ -170,7 +171,9 @@ export default function Home({ setIsLoggedIn }) {
                   <span className="text-xl">🗺️</span>
                   <h3 className="text-lg font-semibold text-white">Interactive Map</h3>
                 </div>
-                <GeoMap lat={currentGeo.lat} lon={currentGeo.lon} />
+                <MapErrorBoundary>
+                  <GeoMap lat={currentGeo.lat} lon={currentGeo.lon} />
+                </MapErrorBoundary>
               </div>
             )}
           </div>
