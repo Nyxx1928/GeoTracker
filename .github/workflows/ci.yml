@@ -23,7 +23,7 @@ jobs:
           extensions: mbstring, bcmath, xml, ctype, json, openssl
 
       - name: Cache Composer
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.composer/cache
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
