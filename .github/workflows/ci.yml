@@ -67,7 +67,7 @@ jobs:
 
       - name: Run frontend tests
         working-directory: frontend
-        run: npm test --if-present --silent || true
+        run: npm test --if-present --silent
 
       - name: Build frontend
         working-directory: frontend
