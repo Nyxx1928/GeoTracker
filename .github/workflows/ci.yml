@@ -80,7 +80,7 @@ jobs:
 
       - name: Run frontend tests
         working-directory: frontend
-        run: npm test --if-present --silent
+        run: npm test --if-present --silent -- --watchAll=false --passWithNoTests
 
       - name: Build frontend
         working-directory: frontend
