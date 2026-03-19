@@ -40,7 +40,7 @@ jobs:
 
       - name: Generate app key
         working-directory: backend/laravel-backend
-        run: php artisan key:generate --no-interaction || true
+        run: php artisan key:generate --no-interaction
 
       - name: Run PHP unit tests
         working-directory: backend/laravel-backend
