@@ -22,10 +22,15 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: mbstring, bcmath, xml, ctype, json, openssl
 
+      - name: Determine Composer cache directory
+        id: composer-cache
+        run: |
+          echo "dir=$(composer config cache-files-dir --global 2>/dev/null || echo "$HOME/.cache/composer")" >> "$GITHUB_OUTPUT"
+
       - name: Cache Composer
         uses: actions/cache@v4
         with:
-          path: ~/.composer/cache
+          path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
