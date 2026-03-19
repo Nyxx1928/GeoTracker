@@ -44,7 +44,7 @@ jobs:
 
       - name: Run PHP unit tests
         working-directory: backend/laravel-backend
-        run: vendor/bin/phpunit --configuration phpunit.xml || true
+        run: vendor/bin/phpunit --configuration phpunit.xml
 
   frontend:
     name: Frontend — Node tests and build
