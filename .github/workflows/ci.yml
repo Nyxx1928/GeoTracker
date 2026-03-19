@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend — Laravel tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [8.4]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, bcmath, xml, ctype, json, openssl
+
+      - name: Determine Composer cache directory
+        id: composer-cache
+        run: |
+          echo "dir=$(composer config cache-files-dir --global 2>/dev/null || echo "$HOME/.cache/composer")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        working-directory: backend/laravel-backend
+        run: composer install --no-progress --prefer-dist --no-interaction
+
+      - name: Prepare environment
+        run: |
+          if [ -f backend/laravel-backend/.env.example ]; then cp backend/laravel-backend/.env.example backend/laravel-backend/.env; fi
+        shell: bash
+
+      - name: Generate app key
+        working-directory: backend/laravel-backend
+        run: php artisan key:generate --no-interaction
+
+      - name: Run PHP unit tests
+        working-directory: backend/laravel-backend
+        run: vendor/bin/phpunit --configuration phpunit.xml
+
+  frontend:
+    name: Frontend — Node tests and build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+          node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Pin npm version
+        run: npm i -g npm@10.8.2
+
+      - name: Show frontend toolchain and lockfile info
+        working-directory: frontend
+        run: |
+          echo "GITHUB_SHA=${GITHUB_SHA}"
+          node -v
+          npm -v
+          grep -n '"node_modules/tailwindcss/node_modules/yaml"' package-lock.json || true
+          grep -n '"version": "2.8.2"' package-lock.json | head -n 5 || true
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run frontend tests
+        working-directory: frontend
+        run: npm test --if-present --silent -- --watchAll=false --passWithNoTests
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build --if-present
