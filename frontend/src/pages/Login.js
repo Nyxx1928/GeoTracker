@@ -20,7 +20,7 @@ export default function Login({ setIsLoggedIn }) {
       localStorage.setItem('auth_token', res.data.token);
       setIsLoggedIn(true);
       navigate('/home');
-    } catch (err) {
+    } catch {
       setError('Invalid credentials, please try again.');
     } finally {
       setLoading(false);

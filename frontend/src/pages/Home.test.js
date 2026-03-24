@@ -18,8 +18,8 @@ jest.mock('../api', () => ({
   }
 }));
 
-jest.mock('../components/GeoMap', () => () => <div data-testid="geo-map" />);
-jest.mock('../components/MapErrorBoundary', () => ({ children }) => <>{children}</>);
+jest.mock('../components/GeoMap', () => function GeoMapMock() { return <div data-testid="geo-map" />; });
+jest.mock('../components/MapErrorBoundary', () => function MapErrorBoundaryMock({ children }) { return <>{children}</>; });
 
 const initialGeo = {
   query: '1.1.1.1',
@@ -36,14 +36,14 @@ describe('Home page', () => {
     localStorage.clear();
   });
 
-  function renderHome(setIsLoggedIn = jest.fn()) {
+  function setupHome(setIsLoggedIn = jest.fn()) {
     render(<Home setIsLoggedIn={setIsLoggedIn} />);
     return setIsLoggedIn;
   }
 
   test('loads and displays current geolocation details', async () => {
     api.get.mockResolvedValueOnce({ data: initialGeo });
-    renderHome();
+    setupHome();
 
     expect(await screen.findByText('Location Details')).toBeInTheDocument();
     expect(screen.getByText('1.1.1.1')).toBeInTheDocument();
@@ -53,7 +53,7 @@ describe('Home page', () => {
 
   test('shows validation error for invalid IP format', async () => {
     api.get.mockResolvedValueOnce({ data: initialGeo });
-    renderHome();
+    setupHome();
 
     await screen.findByText('Location Details');
     fireEvent.change(screen.getByPlaceholderText(/enter ip address/i), {
@@ -85,7 +85,7 @@ describe('Home page', () => {
       return Promise.reject(new Error(`Unexpected URL: ${url}`));
     });
 
-    renderHome();
+    setupHome();
     await screen.findByText('Location Details');
 
     fireEvent.change(screen.getByPlaceholderText(/enter ip address/i), {
@@ -103,13 +103,13 @@ describe('Home page', () => {
     api.post.mockResolvedValueOnce({});
     localStorage.setItem('auth_token', 'existing-token');
 
-    const setIsLoggedIn = renderHome();
+    const setIsLoggedInMock = setupHome();
     await screen.findByText('Location Details');
 
     fireEvent.click(screen.getByRole('button', { name: /logout/i }));
 
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/api/logout'));
     expect(localStorage.getItem('auth_token')).toBeNull();
-    expect(setIsLoggedIn).toHaveBeenCalledWith(false);
+    expect(setIsLoggedInMock).toHaveBeenCalledWith(false);
   });
 });

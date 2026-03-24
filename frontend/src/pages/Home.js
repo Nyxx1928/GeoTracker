@@ -59,7 +59,7 @@ export default function Home({ setIsLoggedIn }) {
       } else {
         setError(res.data?.message || 'Location data not available for this IP address');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch geolocation. Please try again.');
     } finally {
       setLoading(false);

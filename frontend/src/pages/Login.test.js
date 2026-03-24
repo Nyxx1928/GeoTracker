@@ -23,13 +23,13 @@ describe('Login page', () => {
     localStorage.clear();
   });
 
-  function renderLogin(setIsLoggedIn = jest.fn()) {
+  function setupLogin(setIsLoggedIn = jest.fn()) {
     render(<Login setIsLoggedIn={setIsLoggedIn} />);
     return setIsLoggedIn;
   }
 
   test('renders login form', () => {
-    renderLogin();
+    setupLogin();
 
     expect(screen.getByText('Welcome Back')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Enter your email')).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe('Login page', () => {
 
   test('submits credentials and stores auth token on success', async () => {
     api.post.mockResolvedValue({ data: { token: 'test-token' } });
-    const setIsLoggedIn = renderLogin();
+    const setIsLoggedInMock = setupLogin();
 
     fireEvent.change(screen.getByPlaceholderText('Enter your email'), {
       target: { value: 'test@example.com' }
@@ -57,12 +57,12 @@ describe('Login page', () => {
     });
 
     expect(localStorage.getItem('auth_token')).toBe('test-token');
-    expect(setIsLoggedIn).toHaveBeenCalledWith(true);
+    expect(setIsLoggedInMock).toHaveBeenCalledWith(true);
   });
 
   test('shows an error message for invalid credentials', async () => {
     api.post.mockRejectedValue(new Error('Unauthorized'));
-    renderLogin();
+    setupLogin();
 
     fireEvent.change(screen.getByPlaceholderText('Enter your email'), {
       target: { value: 'bad@example.com' }
