@@ -171,7 +171,7 @@ export default function Home({ setIsLoggedIn }) {
                   <span className="text-xl">🗺️</span>
                   <h3 className="text-lg font-semibold text-white">Interactive Map</h3>
                 </div>
-                <MapErrorBoundary>
+                <MapErrorBoundary lat={currentGeo.lat} lon={currentGeo.lon}>
                   <GeoMap lat={currentGeo.lat} lon={currentGeo.lon} />
                 </MapErrorBoundary>
               </div>
