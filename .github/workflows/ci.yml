@@ -49,7 +49,7 @@ jobs:
 
       - name: Run PHP unit tests
         working-directory: backend
-        run: vendor/bin/phpunit --configuration phpunit.xml
+        run: php vendor/bin/phpunit --configuration phpunit.xml
 
   frontend:
     name: Frontend — Node tests and build
