@@ -1,4 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState, useCallback } from 'react';
+import Map, { Marker, NavigationControl, Popup } from 'react-map-gl/maplibre';
+import 'maplibre-gl/dist/maplibre-gl.css';
+
+// Free CARTO Voyager style — clean, modern, no API key needed
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
 
 function checkWebGL() {
   try {
@@ -12,13 +17,12 @@ function checkWebGL() {
   }
 }
 
-// Fallback: static OpenStreetMap tile-based map using an iframe
 function StaticMap({ lat, lon }) {
   const osmUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.05},${lat - 0.05},${lon + 0.05},${lat + 0.05}&layer=mapnik&marker=${lat},${lon}`;
   const osmLink = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=13/${lat}/${lon}`;
 
   return (
-    <div className="w-full h-64 sm:h-80 rounded-xl overflow-hidden border border-gray-700 shadow-lg shadow-cyan-900/20 relative">
+    <div className="w-full h-64 sm:h-80 rounded-xl overflow-hidden border border-gray-700 shadow-lg relative">
       <iframe
         title="Location map"
         src={osmUrl}
@@ -33,86 +37,65 @@ function StaticMap({ lat, lon }) {
         href={osmLink}
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute bottom-2 right-2 bg-gray-900/80 text-cyan-400 text-xs px-2 py-1 rounded hover:bg-gray-800 transition-colors"
+        className="absolute bottom-2 right-2 bg-white/90 text-blue-600 text-xs px-2 py-1 rounded shadow hover:bg-white transition-colors"
       >
-        View larger map ↗
+        View larger ↗
       </a>
     </div>
   );
 }
 
 export default function GeoMap({ lat, lon }) {
-  const containerRef = useRef(null);
-  const mapRef = useRef(null);
-  const [error, setError] = useState(null);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [mapError, setMapError] = useState(false);
   const [webglSupported] = useState(() => checkWebGL());
 
-  useEffect(() => {
-    if (!webglSupported) return;
+  const handleMarkerClick = useCallback(() => setPopupOpen(v => !v), []);
+  const handleMapError = useCallback((e) => {
+    console.error('Map error:', e);
+    setMapError(true);
+  }, []);
 
-    let map = null;
-
-    async function initMap() {
-      try {
-        const maplibregl = (await import('maplibre-gl')).default;
-        await import('maplibre-gl/dist/maplibre-gl.css');
-
-        if (!maplibregl.supported({ failIfMajorPerformanceCaveat: false })) {
-          setError('webgl-unsupported');
-          return;
-        }
-
-        if (!containerRef.current) return;
-
-        if (mapRef.current) {
-          mapRef.current.remove();
-          mapRef.current = null;
-        }
-
-        map = new maplibregl.Map({
-          container: containerRef.current,
-          style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-          center: [lon, lat],
-          zoom: 10,
-        });
-
-        map.on('error', (e) => {
-          console.error('Map error:', e);
-          setError('load-failed');
-        });
-
-        map.addControl(new maplibregl.NavigationControl(), 'top-right');
-
-        new maplibregl.Marker({ color: '#06b6d4' })
-          .setLngLat([lon, lat])
-          .addTo(map);
-
-        mapRef.current = map;
-      } catch (e) {
-        console.error('Map init error:', e);
-        setError('init-failed');
-      }
-    }
-
-    initMap();
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, [lat, lon, webglSupported]);
-
-  // Use static OSM iframe fallback when WebGL is unavailable or map errors out
-  if (!webglSupported || error) {
+  if (!webglSupported || mapError) {
     return <StaticMap lat={lat} lon={lon} />;
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-64 sm:h-80 rounded-xl overflow-hidden border border-gray-700 shadow-lg shadow-cyan-900/20"
-    />
+    <div className="w-full h-64 sm:h-80 rounded-xl overflow-hidden border border-gray-200 shadow-lg shadow-cyan-900/10">
+      <Map
+        initialViewState={{ longitude: lon, latitude: lat, zoom: 11 }}
+        style={{ width: '100%', height: '100%' }}
+        mapStyle={MAP_STYLE}
+        onError={handleMapError}
+        attributionControl={false}
+      >
+        <NavigationControl position="top-right" />
+
+        <Marker longitude={lon} latitude={lat} anchor="bottom" onClick={handleMarkerClick}>
+          <div className="flex flex-col items-center cursor-pointer group">
+            <div className="w-8 h-8 bg-cyan-500 rounded-full border-2 border-white shadow-lg shadow-cyan-500/50 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-2.5 h-2.5 bg-white rounded-full" />
+            </div>
+            <div className="w-0.5 h-3 bg-cyan-500" />
+          </div>
+        </Marker>
+
+        {popupOpen && (
+          <Popup
+            longitude={lon}
+            latitude={lat}
+            anchor="top"
+            offset={[0, -48]}
+            onClose={() => setPopupOpen(false)}
+            closeOnClick={false}
+            className="rounded-lg"
+          >
+            <div className="px-1 py-0.5 text-xs font-mono text-gray-700">
+              {lat.toFixed(4)}, {lon.toFixed(4)}
+            </div>
+          </Popup>
+        )}
+      </Map>
+    </div>
   );
 }
