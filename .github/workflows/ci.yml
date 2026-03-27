@@ -35,20 +35,20 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Composer dependencies
-        working-directory: backend/laravel-backend
+        working-directory: backend
         run: composer install --no-progress --prefer-dist --no-interaction
 
       - name: Prepare environment
         run: |
-          if [ -f backend/laravel-backend/.env.example ]; then cp backend/laravel-backend/.env.example backend/laravel-backend/.env; fi
+          if [ -f backend/.env.example ]; then cp backend/.env.example backend/.env; fi
         shell: bash
 
       - name: Generate app key
-        working-directory: backend/laravel-backend
+        working-directory: backend
         run: php artisan key:generate --no-interaction
 
       - name: Run PHP unit tests
-        working-directory: backend/laravel-backend
+        working-directory: backend
         run: vendor/bin/phpunit --configuration phpunit.xml
 
   frontend:
