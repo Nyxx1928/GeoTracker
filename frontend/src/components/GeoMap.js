@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Map, { Marker, NavigationControl, Popup } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import StaticMap from './StaticMap';
 
-// Free CARTO Voyager style — clean, modern, no API key needed
+// Free CARTO Voyager style - clean, modern, no API key needed
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
 
 function checkWebGL() {
@@ -17,57 +18,46 @@ function checkWebGL() {
   }
 }
 
-function StaticMap({ lat, lon }) {
-  const osmUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.05},${lat - 0.05},${lon + 0.05},${lat + 0.05}&layer=mapnik&marker=${lat},${lon}`;
-  const osmLink = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=13/${lat}/${lon}`;
-
-  return (
-    <div className="w-full h-64 sm:h-80 rounded-xl overflow-hidden border border-gray-700 shadow-lg relative">
-      <iframe
-        title="Location map"
-        src={osmUrl}
-        width="100%"
-        height="100%"
-        style={{ border: 0, display: 'block' }}
-        loading="lazy"
-        referrerPolicy="no-referrer"
-        sandbox="allow-scripts allow-same-origin"
-      />
-      <a
-        href={osmLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="absolute bottom-2 right-2 bg-white/90 text-blue-600 text-xs px-2 py-1 rounded shadow hover:bg-white transition-colors"
-      >
-        View larger ↗
-      </a>
-    </div>
-  );
-}
-
 export default function GeoMap({ lat, lon }) {
   const [popupOpen, setPopupOpen] = useState(false);
   const [mapError, setMapError] = useState(false);
   const [webglSupported] = useState(() => checkWebGL());
+  const [mapInstanceKey, setMapInstanceKey] = useState(0);
 
-  const handleMarkerClick = useCallback(() => setPopupOpen(v => !v), []);
+  const handleMarkerClick = useCallback(() => setPopupOpen((open) => !open), []);
   const handleMapError = useCallback((e) => {
     console.error('Map error:', e);
     setMapError(true);
   }, []);
+  const handleRetryMap = useCallback(() => {
+    setMapError(false);
+    setPopupOpen(false);
+    setMapInstanceKey((key) => key + 1);
+  }, []);
 
-  if (!webglSupported || mapError) {
+  useEffect(() => {
+    // Reset transient map and popup state when the selected coordinates change.
+    setMapError(false);
+    setPopupOpen(false);
+    setMapInstanceKey((key) => key + 1);
+  }, [lat, lon]);
+
+  if (!webglSupported) {
     return <StaticMap lat={lat} lon={lon} />;
+  }
+
+  if (mapError) {
+    return <StaticMap lat={lat} lon={lon} showRetry onRetry={handleRetryMap} />;
   }
 
   return (
     <div className="w-full h-64 sm:h-80 rounded-xl overflow-hidden border border-gray-200 shadow-lg shadow-cyan-900/10">
       <Map
+        key={mapInstanceKey}
         initialViewState={{ longitude: lon, latitude: lat, zoom: 11 }}
         style={{ width: '100%', height: '100%' }}
         mapStyle={MAP_STYLE}
         onError={handleMapError}
-        attributionControl={false}
       >
         <NavigationControl position="top-right" />
 
