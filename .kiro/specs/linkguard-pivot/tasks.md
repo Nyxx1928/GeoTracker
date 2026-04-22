@@ -7,20 +7,20 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
 ## Tasks
 
 - [ ] 1. Backend Foundation: Database and Core Services
-  - [ ] 1.1 Create lookup_history migration
+  - [x] 1.1 Create lookup_history migration
     - Create migration file with schema: id, user_id (foreign key), type, target, resolved_ip, result (JSON), risk_level, uuid (unique), label (nullable), timestamps
     - Add indexes on (user_id, created_at) and uuid
     - Add foreign key constraint on user_id with cascade delete
     - _Requirements: 4.1, 5.1, 6.1_
   
-  - [ ] 1.2 Create LookupHistory Eloquent model
+  - [x] 1.2 Create LookupHistory Eloquent model
     - Define fillable fields, casts (result as array, created_at as datetime)
     - Add boot method to auto-generate UUID v4 on creation
     - Define user() relationship (belongsTo)
     - Add forUser() and recent() query scopes
     - _Requirements: 4.1, 6.1_
   
-  - [ ] 1.3 Implement Resolver service
+  - [x] 1.3 Implement Resolver service
     - Create ResolverInterface and ResolverResult classes
     - Implement target type detection (IP, domain, URL, email) using regex
     - Implement IPv4/IPv6 validation and pass-through
@@ -39,7 +39,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 31: Private IP Range Rejection** - Test that private IP ranges (10.x, 172.16-31.x, 192.168.x, 127.x) are rejected
     - _Requirements: 1.1, 1.2, 1.4, 1.6, 10.5_
   
-  - [ ] 1.5 Implement GeoProvider abstraction
+  - [x] 1.5 Implement GeoProvider abstraction
     - Create GeoProviderInterface and GeoResult classes
     - Implement IpApiProvider with lookup() method
     - Make HTTP request to ip-api.com with fields parameter
@@ -54,7 +54,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - Test timeout handling
     - _Requirements: 2.1, 2.4_
   
-  - [ ] 1.7 Implement RiskScorer service
+  - [x] 1.7 Implement RiskScorer service
     - Create RiskScorer class with score() method
     - Implement deterministic scoring algorithm: HIGH if proxy=true, MEDIUM if hosting=true AND proxy=false, LOW if proxy=false AND hosting=false, UNKNOWN otherwise
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.6_
@@ -63,7 +63,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 8: Deterministic Risk Scoring** - Test that identical inputs produce identical outputs and verify algorithm correctness
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.6_
   
-  - [ ] 1.9 Create AnalyzeController with POST /api/analyze endpoint
+  - [x] 1.9 Create AnalyzeController with POST /api/analyze endpoint
     - Add route in routes/api.php under auth:sanctum middleware
     - Validate request body (target field required)
     - Call Resolver to resolve target to IP
@@ -79,11 +79,11 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - Test error responses (invalid format, DNS failure, private IP)
     - _Requirements: 10.1, 10.2, 10.3_
 
-- [ ] 2. Checkpoint - Ensure all tests pass
+- [x] 2. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 3. History Persistence: CRUD Operations
-  - [ ] 3.1 Update AnalyzeController to persist lookups
+- [x] 3. History Persistence: CRUD Operations
+  - [x] 3.1 Update AnalyzeController to persist lookups
     - After successful resolution and scoring, create LookupHistory record
     - Store user_id, type, target, resolved_ip, result (full geo + dns_records as JSON), risk_level, uuid
     - Include uuid and created_at in response
@@ -93,7 +93,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 10: Lookup Persistence Completeness** - Test that all required fields are persisted for authenticated users
     - _Requirements: 4.1_
   
-  - [ ] 3.3 Create HistoryController with GET /api/history endpoint
+  - [x] 3.3 Create HistoryController with GET /api/history endpoint
     - Add route in routes/api.php under auth:sanctum middleware
     - Query LookupHistory for authenticated user, order by created_at desc, limit 50
     - Return paginated response with data and meta fields
@@ -103,7 +103,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 11: History Ordering and Limiting** - Test that history returns at most 50 records ordered by created_at descending
     - _Requirements: 4.2_
   
-  - [ ] 3.5 Add DELETE /api/history/{id} endpoint
+  - [x] 3.5 Add DELETE /api/history/{id} endpoint
     - Validate that record belongs to authenticated user (403 if not)
     - Delete record and return 200 response
     - _Requirements: 4.3, 4.4_
@@ -113,7 +113,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 13: Ownership Authorization Enforcement** - Test that users cannot delete other users' records
     - _Requirements: 4.3, 4.4_
   
-  - [ ] 3.7 Add DELETE /api/history endpoint
+  - [x] 3.7 Add DELETE /api/history endpoint
     - Delete all LookupHistory records for authenticated user
     - Return 200 response with deleted_count
     - _Requirements: 4.5_
@@ -122,7 +122,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 14: Bulk Deletion Completeness** - Test that all user records are deleted
     - _Requirements: 4.5_
   
-  - [ ] 3.9 Add PATCH /api/history/{id} endpoint
+  - [x] 3.9 Add PATCH /api/history/{id} endpoint
     - Validate label field (max 100 characters)
     - Validate that record belongs to authenticated user (403 if not)
     - Update label and return updated record
@@ -133,11 +133,11 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 18: Label Update Round-Trip** - Test that updated labels are correctly retrieved
     - _Requirements: 5.1, 5.2_
 
-- [ ] 4. Checkpoint - Ensure all tests pass
+- [x] 4. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Frontend Core Components
-  - [ ] 5.1 Create RiskBadge component
+- [x] 5. Frontend Core Components
+  - [x] 5.1 Create RiskBadge component
     - Accept level prop (LOW, MEDIUM, HIGH, UNKNOWN)
     - Render color-coded badge: green for LOW, amber for MEDIUM, red for HIGH, grey for UNKNOWN
     - Add tooltip with risk explanation
@@ -147,7 +147,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 9: Risk Badge Color Mapping** - Test that all risk levels display correct colors
     - _Requirements: 3.5_
   
-  - [ ] 5.3 Create utility functions for formatters
+  - [x] 5.3 Create utility functions for formatters
     - Implement countryCodeToFlag() to convert ISO 3166-1 alpha-2 codes to flag emoji
     - Implement timezoneToLocalTime() to calculate current local time from IANA timezone
     - Implement relativeTimestamp() for "2 hours ago" formatting
@@ -161,7 +161,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 7: Timezone to Local Time Conversion** - Test that valid IANA timezones produce correct local times
     - _Requirements: 2.3_
   
-  - [ ] 5.6 Create CopyButton component
+  - [x] 5.6 Create CopyButton component
     - Accept text prop
     - Render copy icon button
     - Copy text to clipboard on click using navigator.clipboard API
@@ -172,7 +172,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 29: IP Copy Button Functionality** - Test that button copies exact text to clipboard
     - _Requirements: 9.1_
   
-  - [ ] 5.8 Create ResultCard component
+  - [x] 5.8 Create ResultCard component
     - Accept result prop (target, type, resolved_ip, geo, risk_level, uuid, created_at)
     - Display target, resolved IP with CopyButton, geo data (city, country with flag, ISP, org, ASN)
     - Display RiskBadge with risk_level
@@ -187,13 +187,13 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - _Requirements: 1.7, 2.1, 6.4_
 
 - [ ] 6. Frontend Home Page Updates
-  - [ ] 6.1 Update Home.js to use POST /api/analyze endpoint
+  - [x] 6.1 Update Home.js to use POST /api/analyze endpoint
     - Replace GET /api/geo/{ip} with POST /api/analyze
     - Update handleSearch to send target in request body
     - Display ResultCard instead of inline geo data
     - _Requirements: 10.1, 10.2_
   
-  - [ ] 6.2 Create HistoryList component
+  - [x] 6.2 Create HistoryList component
     - Fetch history from GET /api/history on mount
     - Display table with columns: Target, Label, City, Country (flag), Risk Badge, Timestamp
     - Show target field as primary identifier (not resolved_ip)
@@ -210,7 +210,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 19: Label Display Fallback** - Test that label is shown if set, otherwise target
     - _Requirements: 4.6, 4.7, 5.4, 5.5_
   
-  - [ ] 6.4 Integrate HistoryList into Home.js
+  - [x] 6.4 Integrate HistoryList into Home.js
     - Add HistoryList component below search controls
     - Refresh history after successful lookup
     - _Requirements: 4.2, 4.6_
@@ -219,7 +219,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 8. Public Features: Landing Page and Sharing
-  - [ ] 8.1 Create POST /api/analyze/public endpoint
+  - [x] 8.1 Create POST /api/analyze/public endpoint
     - Add route in routes/api.php WITHOUT auth:sanctum middleware
     - Implement identical resolution and enrichment logic as /api/analyze
     - Do NOT persist LookupHistory record
@@ -231,12 +231,12 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 24: Public Lookup Non-Persistence** - Test that public lookups do not create database records
     - _Requirements: 7.6, 10.4_
   
-  - [ ] 8.3 Create GET /api/geo/public endpoint
+  - [x] 8.3 Create GET /api/geo/public endpoint
     - Add route in routes/api.php WITHOUT auth:sanctum middleware
     - Return caller's IP geo data (same as existing /api/geo but unauthenticated)
     - _Requirements: 7.3_
   
-  - [ ] 8.4 Create Landing.js page component
+  - [x] 8.4 Create Landing.js page component
     - Render public landing page at / route
     - Display visitor's IP and geo data by calling GET /api/geo/public on mount
     - Add search bar that calls POST /api/analyze/public
@@ -245,7 +245,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - Add prompt to log in or register to save history
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.7_
   
-  - [ ] 8.5 Create GET /api/lookup/{uuid} endpoint
+  - [x] 8.5 Create GET /api/lookup/{uuid} endpoint
     - Add route in routes/api.php WITHOUT auth:sanctum middleware
     - Query LookupHistory by uuid
     - Return full record data (target, resolved_ip, geo, risk_level, created_at)
@@ -256,14 +256,14 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 21: Public Lookup Accessibility** - Test that valid UUIDs return data without authentication
     - _Requirements: 6.2_
   
-  - [ ] 8.7 Create PublicLookup.js page component
+  - [x] 8.7 Create PublicLookup.js page component
     - Render public result page at /lookup/:uuid route
     - Fetch data from GET /api/lookup/{uuid} on mount
     - Display ResultCard with full result data
     - Handle 404 errors gracefully
     - _Requirements: 6.4_
   
-  - [ ] 8.8 Update App.js routing
+  - [x] 8.8 Update App.js routing
     - Add / route for Landing.js (public)
     - Add /lookup/:uuid route for PublicLookup.js (public)
     - Update /home route to remain protected
@@ -278,7 +278,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 10. Bulk Lookup Feature
-  - [ ] 10.1 Create BulkLookup component
+  - [x] 10.1 Create BulkLookup component
     - Add textarea for newline-separated targets
     - Add submit button
     - Parse textarea into array of targets
@@ -297,7 +297,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 28: Bulk Concurrency Limiting** - Test that max 10 concurrent requests are enforced
     - _Requirements: 8.2, 8.3, 8.4, 8.5_
   
-  - [ ] 10.3 Integrate BulkLookup into Home.js
+  - [x] 10.3 Integrate BulkLookup into Home.js
     - Add tab or toggle to switch between single and bulk lookup modes
     - _Requirements: 8.1_
 
@@ -313,7 +313,7 @@ This implementation plan transforms GeoTracker into LinkGuard by adding support 
     - **Property 30: Theme Preference Persistence Round-Trip** - Test that theme preference is correctly stored and retrieved
     - _Requirements: 9.2, 9.3_
   
-  - [ ] 11.3 Add "What's my IP?" button to Home.js
+  - [x] 11.3 Add "What's my IP?" button to Home.js
     - Fetch user's IP from GET /api/geo
     - Auto-fill search bar with user's IP on click
     - _Requirements: 9.4_
