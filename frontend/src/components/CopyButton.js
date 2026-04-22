@@ -1,0 +1,129 @@
+import React, { useState } from 'react';
+
+/**
+ * CopyButton - A reusable button that copies text to the clipboard.
+ * 
+ * This component provides visual feedback when text is copied:
+ * - Shows a copy icon normally
+ * - Shows a checkmark briefly after copying
+ * - Displays a tooltip on hover
+ * 
+ * Teaching Point: This demonstrates React state management for UI feedback.
+ * The component manages its own "copied" state to show temporary feedback,
+ * then resets after 2 seconds.
+ */
+const CopyButton = ({ text, label = 'Copy', compact = false }) => {
+  const [copied, setCopied] = useState(false);
+
+  /**
+   * Handle the copy action.
+   * 
+   * Uses the modern Clipboard API (navigator.clipboard.writeText).
+   * This is more secure than the old document.execCommand('copy') method.
+   * 
+   * Teaching Point: The Clipboard API is asynchronous and returns a Promise.
+   * We use async/await to handle it cleanly. If it fails (e.g., user denied
+   * permission), we catch the error and log it.
+   */
+  const handleCopy = async () => {
+    try {
+      // Write text to clipboard
+      await navigator.clipboard.writeText(text);
+      
+      // Show success feedback
+      setCopied(true);
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to copy text:', error);
+      // In a production app, you might show an error toast here
+    }
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className={
+        compact
+          ? "p-2 text-gray-400 hover:text-cyan-400 transition-colors"
+          : `
+        inline-flex items-center px-3 py-1.5 text-sm font-medium
+        text-gray-700 bg-white border border-gray-300 rounded-md
+        hover:bg-gray-50 focus:outline-none focus:ring-2
+        focus:ring-offset-2 focus:ring-blue-500
+        transition-colors duration-200
+        group relative
+      `
+      }
+      title={copied ? 'Copied!' : label}
+    >
+      {compact ? (
+        // Compact mode: just an emoji icon
+        <span>{copied ? '✓' : '🔗'}</span>
+      ) : (
+        <>
+          {/* Icon changes based on copied state */}
+          {copied ? (
+            // Checkmark icon (success state)
+            <svg
+              className="w-4 h-4 text-green-600"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+          ) : (
+            // Copy icon (normal state)
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
+            </svg>
+          )}
+          
+          {/* Button text */}
+          <span className="ml-1.5">
+            {copied ? 'Copied!' : label}
+          </span>
+
+          {/* Tooltip (shows on hover) */}
+          <div
+            className="
+              absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2
+              px-2 py-1 bg-gray-900 text-white text-xs rounded
+              opacity-0 group-hover:opacity-100 transition-opacity duration-200
+              pointer-events-none whitespace-nowrap z-10
+            "
+          >
+            {copied ? 'Copied to clipboard!' : `Click to copy ${label.toLowerCase()}`}
+            {/* Tooltip arrow */}
+            <div
+              className="
+                absolute top-full left-1/2 transform -translate-x-1/2
+                border-4 border-transparent border-t-gray-900
+              "
+            />
+          </div>
+        </>
+      )}
+    </button>
+  );
+};
+
+export default CopyButton;
+
