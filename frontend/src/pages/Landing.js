@@ -1,17 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import PageHeader from '../components/layout/PageHeader';
+import PageContainer from '../components/layout/PageContainer';
+import Button from '../components/ui/Button';
 import ResultCard from '../components/ResultCard';
+import TransparencyPanel from '../components/TransparencyPanel';
+import EducationalTooltip from '../components/EducationalTooltip';
+import LoadingState from '../components/LoadingState';
+import RiskDisplay from '../components/RiskDisplay';
 
 /**
  * Landing - Public landing page for unauthenticated users.
  * 
  * Features:
+ * - Professional hero section with branding
  * - Shows visitor's IP and location automatically
  * - Allows public lookups without authentication
- * - "What's my IP?" button to auto-fill search
+ * - Educational tooltips for key features
+ * - Transparency panel explaining validation methodology
+ * - Uses new design system components
  * - Prompts users to log in or register to save history
- * - Uses public API endpoints (no auth required)
+ * 
+ * Requirements: 1.1, 1.4, 2.1, 4.1, 10.1, 10.3
  */
 const Landing = () => {
   const navigate = useNavigate();
@@ -85,79 +96,125 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 to-black text-gray-100 p-4 sm:p-8">
+    <PageContainer className="text-gray-100">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-600 bg-clip-text text-transparent">
-            LinkGuard
-          </h1>
-          <p className="text-gray-400 mt-1">Analyze links, domains, and IPs for security risks</p>
-        </div>
-        <div className="flex gap-3">
-          <button
-            onClick={() => navigate('/login')}
-            className="px-6 py-2.5 bg-gray-800 text-gray-300 rounded-lg font-medium hover:bg-gray-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-cyan-500/20"
-          >
-            Log In
-          </button>
-          <button
-            onClick={() => navigate('/register')}
-            className="px-6 py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white rounded-lg font-medium hover:from-cyan-700 hover:to-cyan-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-cyan-500/20"
-          >
-            Sign Up
-          </button>
+      <PageHeader showAuth={true} isAuthenticated={false} />
+
+      {/* Hero Section */}
+      <div className="text-center mb-12 py-8">
+        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-600 bg-clip-text text-transparent">
+          Validate Links Before You Click
+        </h2>
+        <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-6">
+          Protect yourself from malicious links, phishing attempts, and suspicious domains. 
+          Get instant security analysis with geographic intelligence and risk assessment.
+        </p>
+        <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-400">
+          <div className="flex items-center gap-2">
+            <EducationalTooltip
+              content="We analyze IP addresses, domains, URLs, and email addresses to detect potential security threats based on network characteristics and geographic data."
+              position="bottom"
+            >
+              <span className="flex items-center gap-2 cursor-help hover:text-cyan-400 transition-colors">
+                <span className="text-2xl">🔍</span>
+                <span>Multi-Source Analysis</span>
+              </span>
+            </EducationalTooltip>
+          </div>
+          <div className="flex items-center gap-2">
+            <EducationalTooltip
+              content="Get results in seconds with real-time DNS resolution, geolocation lookup, and network intelligence analysis."
+              position="bottom"
+            >
+              <span className="flex items-center gap-2 cursor-help hover:text-cyan-400 transition-colors">
+                <span className="text-2xl">⚡</span>
+                <span>Instant Results</span>
+              </span>
+            </EducationalTooltip>
+          </div>
+          <div className="flex items-center gap-2">
+            <EducationalTooltip
+              content="We use standard DNS queries and reputable geolocation databases. No data is stored without your permission."
+              position="bottom"
+            >
+              <span className="flex items-center gap-2 cursor-help hover:text-cyan-400 transition-colors">
+                <span className="text-2xl">🔒</span>
+                <span>Privacy Focused</span>
+              </span>
+            </EducationalTooltip>
+          </div>
         </div>
       </div>
 
       {/* Visitor IP Display */}
       {visitorGeo && (
-        <div className="bg-gray-900/80 backdrop-blur-md p-6 rounded-2xl border border-gray-800/50 shadow-2xl mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl">📍</span>
+        <div className="bg-gray-900/60 backdrop-blur-md p-6 rounded-2xl border border-cyan-500/20 shadow-2xl shadow-cyan-500/10 mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-3xl">📍</span>
             <div>
-              <h3 className="text-lg font-semibold text-white">Your Location</h3>
-              <p className="text-sm text-gray-400">Detected from your IP address</p>
+              <h3 className="text-xl font-semibold text-white">Your Current Location</h3>
+              <p className="text-sm text-gray-400">Automatically detected from your IP address</p>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-            <div>
-              <span className="text-gray-400 text-sm">IP Address</span>
-              <p className="font-mono font-semibold text-white">{visitorGeo.query}</p>
+            <div className="bg-gray-800/50 p-4 rounded-lg">
+              <span className="text-gray-400 text-xs uppercase tracking-wide">IP Address</span>
+              <p className="font-mono font-semibold text-white text-lg mt-1">{visitorGeo.query}</p>
             </div>
             {visitorGeo.city && (
-              <div>
-                <span className="text-gray-400 text-sm">Location</span>
-                <p className="font-semibold text-white">
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <span className="text-gray-400 text-xs uppercase tracking-wide">Location</span>
+                <p className="font-semibold text-white text-lg mt-1">
                   {visitorGeo.city}, {visitorGeo.country}
                 </p>
               </div>
             )}
             {visitorGeo.isp && (
-              <div>
-                <span className="text-gray-400 text-sm">ISP</span>
-                <p className="font-semibold text-white">{visitorGeo.isp}</p>
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <span className="text-gray-400 text-xs uppercase tracking-wide">ISP</span>
+                <p className="font-semibold text-white text-lg mt-1">{visitorGeo.isp}</p>
               </div>
             )}
           </div>
         </div>
       )}
 
+      {/* Loading State */}
+      {loading && (
+        <div className="mb-8 bg-gray-900/60 backdrop-blur-md p-8 rounded-2xl border border-cyan-500/20">
+          <LoadingState
+            message="Analyzing security indicators..."
+            steps={[
+              'Resolving domain',
+              'Checking geolocation',
+              'Analyzing network',
+              'Calculating risk score'
+            ]}
+            currentStep={1}
+            size="lg"
+          />
+        </div>
+      )}
+
       {/* Current Result Display */}
-      {currentResult && (
+      {currentResult && !loading && (
         <div className="mb-8">
           <ResultCard result={currentResult} showShareLink={false} />
         </div>
       )}
 
       {/* Search Controls */}
-      <div className="bg-gray-900/80 backdrop-blur-md p-6 rounded-2xl border border-gray-800/50 shadow-2xl mb-8">
-        <div className="flex flex-col gap-3">
+      <div className="bg-gray-900/60 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-cyan-500/20 shadow-2xl shadow-cyan-500/10 mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-2xl">🔍</span>
+          <h3 className="text-xl font-semibold text-white">Analyze a Target</h3>
+        </div>
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
               <input
                 type="text"
-                placeholder="Enter IP, domain, URL, or email (e.g. 8.8.8.8, example.com, https://example.com, user@example.com)"
+                placeholder="Enter IP, domain, URL, or email (e.g., 8.8.8.8, example.com, https://example.com)"
                 value={searchTarget}
                 onChange={(e) => {
                   setSearchTarget(e.target.value);
@@ -167,84 +224,95 @@ const Landing = () => {
                   if (e.key === 'Enter' && !loading) handleSearch();
                 }}
                 disabled={loading}
-                className="w-full px-4 py-3.5 bg-gray-800 border border-gray-700 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium placeholder-gray-500"
+                className="w-full px-5 py-4 bg-gray-800/80 border-2 border-gray-700 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium placeholder-gray-500 text-base"
               />
             </div>
-            <button
+            <Button
+              variant="primary"
+              size="lg"
               onClick={handleSearch}
               disabled={loading}
-              className="px-8 py-3.5 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-semibold rounded-xl hover:from-cyan-500 hover:to-cyan-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-w-[120px]"
+              loading={loading}
+              icon={!loading && <span>🔍</span>}
+              iconPosition="left"
+              className="shadow-lg hover:shadow-cyan-500/50 min-w-[140px]"
             >
-              {loading ? (
-                <>
-                  <span className="animate-spin">⏳</span>
-                  <span>Searching...</span>
-                </>
-              ) : (
-                <>
-                  <span>🔍</span>
-                  <span>Analyze</span>
-                </>
-              )}
-            </button>
+              {loading ? 'Analyzing...' : 'Analyze'}
+            </Button>
           </div>
 
-          <div className="flex gap-3">
-            <button
+          <div className="flex flex-wrap gap-3">
+            <Button
+              variant="secondary"
+              size="md"
               onClick={handleWhatsMyIP}
               disabled={loading || !visitorGeo}
-              className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg font-medium hover:bg-gray-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              icon={<span>📍</span>}
+              iconPosition="left"
             >
-              <span>📍</span>
-              <span>What's my IP?</span>
-            </button>
-            <button
+              What's my IP?
+            </Button>
+            <Button
+              variant="ghost"
+              size="md"
               onClick={clearSearch}
               disabled={loading}
-              className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg font-medium hover:bg-gray-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              icon={<span>🗑️</span>}
+              iconPosition="left"
             >
-              <span>🗑️</span>
-              <span>Clear</span>
-            </button>
+              Clear
+            </Button>
           </div>
 
           {error && (
-            <div className="mt-2 p-3 bg-red-900/50 border border-red-700/50 rounded-lg">
-              <p className="text-red-400 text-sm flex items-center">
-                <span className="mr-2">⚠️</span>
-                {error}
+            <div className="mt-2 p-4 bg-red-900/50 border-2 border-red-700/50 rounded-xl">
+              <p className="text-red-300 text-sm flex items-center">
+                <span className="mr-2 text-lg">⚠️</span>
+                <span className="font-medium">{error}</span>
               </p>
             </div>
           )}
         </div>
       </div>
 
+      {/* Transparency Panel */}
+      <div className="mb-8">
+        <TransparencyPanel />
+      </div>
+
       {/* Call to Action */}
-      <div className="bg-gradient-to-r from-cyan-900/50 to-blue-900/50 backdrop-blur-md p-8 rounded-2xl border border-cyan-700/50 shadow-2xl">
+      <div className="bg-gradient-to-r from-cyan-900/40 to-blue-900/40 backdrop-blur-md p-8 sm:p-10 rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/10">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-3">
-            Want to save your lookups?
+          <div className="inline-block p-3 bg-cyan-500/20 rounded-full mb-4">
+            <span className="text-4xl">💾</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+            Want to Save Your Lookups?
           </h2>
-          <p className="text-gray-300 mb-6">
-            Create a free account to save your lookup history, add custom labels, and share results with your team.
+          <p className="text-gray-300 text-base sm:text-lg mb-6 max-w-2xl mx-auto">
+            Create a free account to save your lookup history, add custom labels, 
+            and share results with your team. Track patterns and build your security intelligence.
           </p>
-          <div className="flex justify-center gap-4">
-            <button
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button
+              variant="primary"
+              size="lg"
               onClick={() => navigate('/register')}
-              className="px-8 py-3 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-semibold rounded-xl hover:from-cyan-500 hover:to-cyan-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-cyan-500/50"
+              className="shadow-lg hover:shadow-cyan-500/50"
             >
               Create Free Account
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
               onClick={() => navigate('/login')}
-              className="px-8 py-3 bg-gray-800 text-gray-300 font-semibold rounded-xl hover:bg-gray-700 transform hover:scale-105 transition-all duration-200"
             >
               Log In
-            </button>
+            </Button>
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

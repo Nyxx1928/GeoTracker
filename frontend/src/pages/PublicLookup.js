@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ResultCard from '../components/ResultCard';
+import LoadingState from '../components/LoadingState';
+import { PageContainer, PageHeader } from '../components/layout';
+import { Input, Button, Card } from '../components/ui';
 
 /**
  * PublicLookup - Public page for viewing shared lookup results.
@@ -11,9 +14,13 @@ import ResultCard from '../components/ResultCard';
  * 
  * Features:
  * - Fetches lookup data by UUID from public API
- * - Displays full result using ResultCard
- * - Handles 404 errors gracefully
+ * - Displays full result using enhanced ResultCard
+ * - Professional loading states with LoadingState component
+ * - Friendly error handling with clear messages
  * - Provides navigation back to landing page
+ * - Uses new design system components for consistency
+ * 
+ * Requirements: 4.1, 4.3, 6.1, 6.2, 8.1, 8.3, 11.2
  */
 const PublicLookup = () => {
   const { uuid } = useParams();
@@ -21,6 +28,7 @@ const PublicLookup = () => {
   const [lookup, setLookup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [loadingStep, setLoadingStep] = useState(0);
 
   useEffect(() => {
     fetchLookup();
@@ -29,10 +37,19 @@ const PublicLookup = () => {
   const fetchLookup = async () => {
     setLoading(true);
     setError('');
+    setLoadingStep(0);
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+      
+      // Simulate loading steps for better UX
+      setLoadingStep(0);
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      setLoadingStep(1);
       const res = await axios.get(`${apiUrl}/api/lookup/${uuid}`);
+      
+      setLoadingStep(2);
       
       // Transform the data to match ResultCard's expected format
       const transformedData = {
@@ -51,6 +68,10 @@ const PublicLookup = () => {
       console.error('Failed to fetch lookup:', err);
       if (err.response?.status === 404) {
         setError('Lookup not found. The link may be invalid or the lookup may have been deleted.');
+      } else if (err.response?.status === 500) {
+        setError('Server error occurred. Our team has been notified. Please try again later.');
+      } else if (err.code === 'ERR_NETWORK') {
+        setError('Network connection failed. Please check your internet connection and try again.');
       } else {
         setError('Failed to load lookup. Please try again.');
       }
@@ -59,94 +80,110 @@ const PublicLookup = () => {
     }
   };
 
+  const loadingSteps = [
+    'Connecting to server',
+    'Fetching lookup data',
+    'Preparing results',
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 to-black text-gray-100 p-4 sm:p-8">
+    <PageContainer>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-600 bg-clip-text text-transparent">
-            LinkGuard
-          </h1>
-          <p className="text-gray-400 mt-1">Shared Lookup Result</p>
-        </div>
-        <div className="flex gap-3">
-          <button
+      <PageHeader
+        showAuth={true}
+        isAuthenticated={false}
+        actions={
+          <Button
+            variant="secondary"
+            size="md"
             onClick={() => navigate('/')}
-            className="px-6 py-2.5 bg-gray-800 text-gray-300 rounded-lg font-medium hover:bg-gray-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-cyan-500/20"
+            className="shadow-lg hover:shadow-cyan-500/20"
           >
             ← Back to Home
-          </button>
-          <button
-            onClick={() => navigate('/login')}
-            className="px-6 py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white rounded-lg font-medium hover:from-cyan-700 hover:to-cyan-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-cyan-500/20"
-          >
-            Log In
-          </button>
-        </div>
-      </div>
+          </Button>
+        }
+      />
 
       {/* Loading State */}
       {loading && (
-        <div className="bg-gray-900/80 backdrop-blur-md p-12 rounded-2xl border border-gray-800/50 shadow-2xl">
-          <div className="flex flex-col items-center justify-center">
-            <span className="text-4xl mb-4 animate-spin">⏳</span>
-            <p className="text-gray-400 text-lg">Loading lookup...</p>
-          </div>
-        </div>
+        <Card variant="elevated" padding="lg" className="text-center">
+          <LoadingState
+            message="Loading shared lookup..."
+            steps={loadingSteps}
+            currentStep={loadingStep}
+            size="lg"
+          />
+        </Card>
       )}
 
       {/* Error State */}
       {error && !loading && (
-        <div className="bg-gray-900/80 backdrop-blur-md p-12 rounded-2xl border border-gray-800/50 shadow-2xl">
-          <div className="flex flex-col items-center justify-center">
-            <span className="text-6xl mb-4">❌</span>
-            <h2 className="text-2xl font-bold text-white mb-3">Lookup Not Found</h2>
-            <p className="text-gray-400 text-center mb-6 max-w-md">
+        <Card variant="elevated" padding="lg">
+          <div className="flex flex-col items-center justify-center text-center">
+            <div className="w-16 h-16 bg-risk-danger/10 rounded-full flex items-center justify-center mb-4">
+              <span className="text-4xl">❌</span>
+            </div>
+            <h2 className="text-2xl font-bold text-neutral-900 mb-3">
+              Lookup Not Found
+            </h2>
+            <p className="text-neutral-600 mb-6 max-w-md">
               {error}
             </p>
-            <button
-              onClick={() => navigate('/')}
-              className="px-8 py-3 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-semibold rounded-xl hover:from-cyan-500 hover:to-cyan-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-cyan-500/50"
-            >
-              Go to Home Page
-            </button>
+            <div className="flex gap-3">
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => navigate('/')}
+              >
+                Go to Home Page
+              </Button>
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={fetchLookup}
+              >
+                Try Again
+              </Button>
+            </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Success State - Display Result */}
       {lookup && !loading && !error && (
-        <div>
+        <div className="space-y-8">
           <ResultCard result={lookup} showShareLink={true} />
           
           {/* Call to Action */}
-          <div className="mt-8 bg-gradient-to-r from-cyan-900/50 to-blue-900/50 backdrop-blur-md p-8 rounded-2xl border border-cyan-700/50 shadow-2xl">
+          <Card variant="elevated" padding="lg" className="bg-gradient-to-r from-cyan-900/20 to-blue-900/20 border-cyan-700/30">
             <div className="text-center">
               <h2 className="text-2xl font-bold text-white mb-3">
                 Want to analyze your own links?
               </h2>
-              <p className="text-gray-300 mb-6">
+              <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
                 Create a free account to save your lookup history, add custom labels, and share results with your team.
               </p>
-              <div className="flex justify-center gap-4">
-                <button
+              <div className="flex justify-center gap-4 flex-wrap">
+                <Button
+                  variant="primary"
+                  size="lg"
                   onClick={() => navigate('/register')}
-                  className="px-8 py-3 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-semibold rounded-xl hover:from-cyan-500 hover:to-cyan-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-cyan-500/50"
                 >
                   Create Free Account
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="lg"
                   onClick={() => navigate('/')}
-                  className="px-8 py-3 bg-gray-800 text-gray-300 font-semibold rounded-xl hover:bg-gray-700 transform hover:scale-105 transition-all duration-200"
                 >
                   Try It Now
-                </button>
+                </Button>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 };
 
