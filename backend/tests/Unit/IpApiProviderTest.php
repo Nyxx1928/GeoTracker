@@ -2,17 +2,17 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
-use App\Services\IpApiProvider;
 use App\Services\GeoResult;
+use App\Services\IpApiProvider;
 use Illuminate\Support\Facades\Http;
+use Tests\TestCase;
 
 /**
  * Unit tests for the IpApiProvider service.
- * 
+ *
  * These tests verify specific examples of successful and failed API responses.
  * We use Laravel's HTTP fake to mock API responses without making real network calls.
- * 
+ *
  * Teaching Point: HTTP::fake() allows us to test HTTP interactions without
  * actually hitting external APIs. This makes tests fast, reliable, and independent
  * of network conditions or API availability.
@@ -24,7 +24,7 @@ class IpApiProviderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->provider = new IpApiProvider();
+        $this->provider = new IpApiProvider;
     }
 
     /**
@@ -51,8 +51,8 @@ class IpApiProviderTest extends TestCase
                 'proxy' => false,
                 'hosting' => true,
                 'mobile' => false,
-                'query' => '8.8.8.8'
-            ], 200)
+                'query' => '8.8.8.8',
+            ], 200),
         ]);
 
         $result = $this->provider->lookup('8.8.8.8');
@@ -87,8 +87,8 @@ class IpApiProviderTest extends TestCase
         Http::fake([
             'ip-api.com/*' => Http::response([
                 'status' => 'fail',
-                'message' => 'invalid query'
-            ], 200)
+                'message' => 'invalid query',
+            ], 200),
         ]);
 
         $result = $this->provider->lookup('invalid');
@@ -107,7 +107,7 @@ class IpApiProviderTest extends TestCase
     {
         // Mock HTTP error response
         Http::fake([
-            'ip-api.com/*' => Http::response(null, 500)
+            'ip-api.com/*' => Http::response(null, 500),
         ]);
 
         $result = $this->provider->lookup('8.8.8.8');
@@ -127,7 +127,7 @@ class IpApiProviderTest extends TestCase
         Http::fake([
             'ip-api.com/*' => function () {
                 throw new \Illuminate\Http\Client\ConnectionException('Connection timeout');
-            }
+            },
         ]);
 
         $result = $this->provider->lookup('8.8.8.8');
@@ -148,9 +148,9 @@ class IpApiProviderTest extends TestCase
                 'status' => 'success',
                 'country' => 'United States',
                 'countryCode' => 'US',
-                'query' => '8.8.8.8'
+                'query' => '8.8.8.8',
                 // Other fields missing
-            ], 200)
+            ], 200),
         ]);
 
         $result = $this->provider->lookup('8.8.8.8');
@@ -160,7 +160,7 @@ class IpApiProviderTest extends TestCase
         $this->assertEquals('8.8.8.8', $result->query);
         $this->assertEquals('United States', $result->country);
         $this->assertEquals('US', $result->countryCode);
-        
+
         // Missing fields should be null
         $this->assertNull($result->city);
         $this->assertNull($result->isp);
@@ -184,8 +184,8 @@ class IpApiProviderTest extends TestCase
                 'proxy' => false,
                 'hosting' => true,
                 'mobile' => false,
-                'query' => '8.8.8.8'
-            ], 200)
+                'query' => '8.8.8.8',
+            ], 200),
         ]);
 
         $result = $this->provider->lookup('8.8.8.8');
@@ -212,8 +212,8 @@ class IpApiProviderTest extends TestCase
         Http::fake([
             'ip-api.com/*' => Http::response([
                 'status' => 'success',
-                'query' => '8.8.8.8'
-            ], 200)
+                'query' => '8.8.8.8',
+            ], 200),
         ]);
 
         $this->provider->lookup('8.8.8.8');

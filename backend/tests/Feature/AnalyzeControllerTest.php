@@ -2,14 +2,13 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\User;
-use App\Models\LookupHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 /**
  * Integration tests for AnalyzeController.
- * 
+ *
  * These tests verify the complete flow from HTTP request to database persistence.
  * We test with real services (not mocks) to ensure everything works together.
  */
@@ -45,7 +44,7 @@ class AnalyzeControllerTest extends TestCase
 
     /**
      * Test successful analysis of a domain.
-     * 
+     *
      * We use example.com because it's guaranteed to exist and resolve.
      */
     public function test_analyze_domain_success(): void
@@ -89,7 +88,7 @@ class AnalyzeControllerTest extends TestCase
 
     /**
      * Test successful analysis of an IP address.
-     * 
+     *
      * We use Google's public DNS (8.8.8.8) as a known-good IP.
      */
     public function test_analyze_ip_success(): void
@@ -193,7 +192,7 @@ class AnalyzeControllerTest extends TestCase
         // Perform two lookups
         $response1 = $this->actingAs($user)
             ->postJson('/api/analyze', ['target' => 'example.com']);
-        
+
         $response2 = $this->actingAs($user)
             ->postJson('/api/analyze', ['target' => 'example.com']);
 

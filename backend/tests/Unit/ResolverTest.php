@@ -2,13 +2,13 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
 use App\Services\Resolver;
 use App\Services\ResolverResult;
+use Tests\TestCase;
 
 /**
  * Unit tests for the Resolver service.
- * 
+ *
  * These tests verify specific examples of each target type and edge cases.
  * Property-based tests are in a separate file (Task 1.4).
  */
@@ -19,7 +19,7 @@ class ResolverTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->resolver = new Resolver();
+        $this->resolver = new Resolver;
     }
 
     /**
@@ -90,13 +90,17 @@ class ResolverTest extends TestCase
         $this->assertNull($result->error);
         $this->assertTrue($result->isSuccessful());
         $this->assertNotEmpty($result->dnsRecords);
-        
+
         // Should have both MX and A records
         $hasMX = false;
         $hasA = false;
         foreach ($result->dnsRecords as $record) {
-            if ($record['type'] === 'MX') $hasMX = true;
-            if ($record['type'] === 'A') $hasA = true;
+            if ($record['type'] === 'MX') {
+                $hasMX = true;
+            }
+            if ($record['type'] === 'A') {
+                $hasA = true;
+            }
         }
         $this->assertTrue($hasMX, 'Should have MX records');
         $this->assertTrue($hasA, 'Should have A records');

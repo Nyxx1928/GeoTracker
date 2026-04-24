@@ -45,7 +45,7 @@ class LookupHistory extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($model) {
             if (empty($model->uuid)) {
                 $model->uuid = Str::uuid();
@@ -64,8 +64,8 @@ class LookupHistory extends Model
     /**
      * Scope a query to only include records for a specific user.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $userId
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  int  $userId
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeForUser($query, $userId)
@@ -76,8 +76,8 @@ class LookupHistory extends Model
     /**
      * Scope a query to get recent records ordered by created_at descending.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $limit
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  int  $limit
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeRecent($query, $limit = 50)

@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Http;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AnalyzeController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HistoryController;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -14,6 +14,7 @@ Route::post('/analyze/public', [AnalyzeController::class, 'analyzePublic'])
     ->middleware('throttle:10,1'); // 10 requests per minute
 Route::get('/geo/public', function () {
     $response = Http::get('http://ip-api.com/json');
+
     return response()->json($response->json(), $response->status());
 });
 
@@ -34,12 +35,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // Get current server/user IP geo
     Route::get('/geo', function () {
         $response = Http::get('http://ip-api.com/json');
+
         return response()->json($response->json(), $response->status());
     });
 
     // Get geo for a specific IP
     Route::get('/geo/{ip}', function (string $ip) {
         $response = Http::get("http://ip-api.com/json/{$ip}");
+
         return response()->json($response->json(), $response->status());
     });
 });

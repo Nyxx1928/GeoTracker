@@ -2,20 +2,20 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
-use App\Services\RiskScorer;
 use App\Services\GeoResult;
+use App\Services\RiskScorer;
+use Tests\TestCase;
 
 /**
  * Unit tests for the RiskScorer service.
- * 
+ *
  * These tests verify the deterministic risk scoring algorithm with specific examples.
  * The RiskScorer assigns risk levels based on network characteristics:
  * - HIGH: Proxy IPs (can hide true origin)
  * - MEDIUM: Hosting/datacenter IPs (often used for automated activities)
  * - LOW: Residential IPs (typical user connections)
  * - UNKNOWN: No usable geo data or indeterminate flags
- * 
+ *
  * Teaching Point: Deterministic algorithms should always produce the same output
  * for the same input. This makes them predictable, testable, and reliable.
  */
@@ -26,7 +26,7 @@ class RiskScorerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->scorer = new RiskScorer();
+        $this->scorer = new RiskScorer;
     }
 
     /**

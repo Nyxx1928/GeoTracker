@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\ResolverInterface;
-use App\Services\GeoProviderInterface;
-use App\Services\RiskScorer;
 use App\Models\LookupHistory;
+use App\Services\GeoProviderInterface;
+use App\Services\ResolverInterface;
+use App\Services\RiskScorer;
+use Illuminate\Http\Request;
 
 /**
  * AnalyzeController - Main orchestration controller for target analysis.
- * 
+ *
  * This controller is the heart of LinkGuard. It coordinates between three services:
  * 1. Resolver: Converts any target (email, URL, domain, IP) to an IP address
  * 2. GeoProvider: Fetches enriched geolocation and network intelligence
  * 3. RiskScorer: Computes risk level based on network characteristics
- * 
+ *
  * The controller is "thin" - it just validates input, calls services, and returns responses.
  * All business logic lives in the service classes, making this easy to test and maintain.
- * 
+ *
  * Teaching Point: This is a great example of the Single Responsibility Principle.
  * The controller doesn't know HOW to resolve DNS or score risk - it just knows
  * WHAT to call and WHEN. This separation makes each piece independently testable.
@@ -27,7 +27,7 @@ class AnalyzeController extends Controller
 {
     /**
      * Constructor with dependency injection.
-     * 
+     *
      * Laravel automatically injects these dependencies when the controller is instantiated.
      * This makes testing easy - we can inject mock services in tests.
      */
@@ -39,7 +39,7 @@ class AnalyzeController extends Controller
 
     /**
      * Analyze a target and return enriched data.
-     * 
+     *
      * This is the main endpoint that brings everything together:
      * - Validates the input
      * - Resolves the target to an IP
@@ -47,8 +47,7 @@ class AnalyzeController extends Controller
      * - Computes risk level
      * - Persists the lookup (for authenticated users)
      * - Returns unified response
-     * 
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function analyze(Request $request)
@@ -58,15 +57,14 @@ class AnalyzeController extends Controller
 
     /**
      * Public analyze endpoint - same as analyze but without authentication.
-     * 
+     *
      * This endpoint allows unauthenticated users to perform lookups on the landing page.
      * Key differences from the authenticated endpoint:
      * - No authentication required
      * - Does NOT persist lookup history
      * - Does NOT include uuid or created_at in response
      * - Rate limited to 10 requests/minute per IP
-     * 
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function analyzePublic(Request $request)
@@ -76,9 +74,8 @@ class AnalyzeController extends Controller
 
     /**
      * Shared analysis logic for both authenticated and public endpoints.
-     * 
-     * @param Request $request
-     * @param bool $persistHistory Whether to save the lookup to history
+     *
+     * @param  bool  $persistHistory  Whether to save the lookup to history
      * @return \Illuminate\Http\JsonResponse
      */
     private function performAnalysis(Request $request, bool $persistHistory)

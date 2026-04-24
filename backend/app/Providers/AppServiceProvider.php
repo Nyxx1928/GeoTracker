@@ -2,11 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use App\Services\ResolverInterface;
-use App\Services\Resolver;
 use App\Services\GeoProviderInterface;
 use App\Services\IpApiProvider;
+use App\Services\Resolver;
+use App\Services\ResolverInterface;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Bind ResolverInterface to Resolver implementation
         $this->app->bind(ResolverInterface::class, Resolver::class);
-        
+
         // Bind GeoProviderInterface to IpApiProvider implementation
         $this->app->bind(GeoProviderInterface::class, IpApiProvider::class);
     }

@@ -4,7 +4,7 @@ namespace App\Services;
 
 /**
  * Data class representing the result of a geolocation lookup.
- * 
+ *
  * Contains all enriched geolocation and network intelligence data
  * returned by the GeoProvider, including ISP information, proxy/hosting flags,
  * geographic coordinates, and timezone data.
@@ -12,24 +12,24 @@ namespace App\Services;
 class GeoResult
 {
     /**
-     * @param string $status API response status: 'success' or 'fail'
-     * @param string|null $message Error message if status is 'fail'
-     * @param string|null $query The queried IP address
-     * @param string|null $country Full country name
-     * @param string|null $countryCode ISO 3166-1 alpha-2 country code
-     * @param string|null $region Region/state code
-     * @param string|null $regionName Full region/state name
-     * @param string|null $city City name
-     * @param string|null $zip ZIP/postal code
-     * @param float|null $lat Latitude coordinate
-     * @param float|null $lon Longitude coordinate
-     * @param string|null $timezone IANA timezone identifier
-     * @param string|null $isp Internet Service Provider name
-     * @param string|null $org Organization name
-     * @param string|null $as Autonomous System Number and name
-     * @param bool|null $proxy Whether the IP is a proxy
-     * @param bool|null $hosting Whether the IP is a hosting/datacenter IP
-     * @param bool|null $mobile Whether the IP is a mobile connection
+     * @param  string  $status  API response status: 'success' or 'fail'
+     * @param  string|null  $message  Error message if status is 'fail'
+     * @param  string|null  $query  The queried IP address
+     * @param  string|null  $country  Full country name
+     * @param  string|null  $countryCode  ISO 3166-1 alpha-2 country code
+     * @param  string|null  $region  Region/state code
+     * @param  string|null  $regionName  Full region/state name
+     * @param  string|null  $city  City name
+     * @param  string|null  $zip  ZIP/postal code
+     * @param  float|null  $lat  Latitude coordinate
+     * @param  float|null  $lon  Longitude coordinate
+     * @param  string|null  $timezone  IANA timezone identifier
+     * @param  string|null  $isp  Internet Service Provider name
+     * @param  string|null  $org  Organization name
+     * @param  string|null  $as  Autonomous System Number and name
+     * @param  bool|null  $proxy  Whether the IP is a proxy
+     * @param  bool|null  $hosting  Whether the IP is a hosting/datacenter IP
+     * @param  bool|null  $mobile  Whether the IP is a mobile connection
      */
     public function __construct(
         public string $status,

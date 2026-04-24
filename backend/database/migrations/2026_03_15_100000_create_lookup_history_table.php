@@ -22,7 +22,7 @@ return new class extends Migration
             $table->uuid('uuid')->unique();       // For public sharing
             $table->string('label', 100)->nullable();  // User-defined label
             $table->timestamps();
-            
+
             // Indexes for fast history retrieval and public lookup
             $table->index(['user_id', 'created_at']);
             $table->index('uuid');
