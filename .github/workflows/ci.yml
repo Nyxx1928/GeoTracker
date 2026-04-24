@@ -93,8 +93,7 @@ jobs:
           echo "Validating package.json files..."
           find . -name "package.json" -not -path "*/node_modules/*" -exec node -e "try { JSON.parse(require('fs').readFileSync('{}', 'utf8')); } catch(e) { console.error('Invalid JSON in {}'); process.exit(1); }" \;
           echo "Validating composer.json..."
-          cd backend
-          composer validate --no-check-publish --strict
+          composer validate --working-dir=backend --no-check-publish --strict
           echo "Dependency manifests are valid"
 
       - name: Sanitize - Check for unsafe input handling
