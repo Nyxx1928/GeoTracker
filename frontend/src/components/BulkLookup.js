@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import api from '../api';
 import RiskBadge from './RiskBadge';
 import { countryCodeToFlag } from '../utils/formatters';
+import { List, Search, Download, Trash2, BarChart3, Check, X } from 'lucide-react';
 
 /**
  * BulkLookup - Component for analyzing multiple targets at once.
@@ -158,7 +159,9 @@ const BulkLookup = () => {
       {/* Input Section */}
       <div className="bg-gray-900/80 backdrop-blur-md p-6 rounded-2xl border border-gray-800/50 shadow-2xl">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-2xl">📋</span>
+          <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/30">
+            <List className="h-5 w-5 text-white" />
+          </div>
           <div>
             <h3 className="text-xl font-bold text-white">Bulk Lookup</h3>
             <p className="text-sm text-gray-400">Analyze multiple targets at once (one per line)</p>
@@ -186,7 +189,7 @@ const BulkLookup = () => {
               </>
             ) : (
               <>
-                <span>🔍</span>
+                <Search className="h-4 w-4" />
                 <span>Analyze All</span>
               </>
             )}
@@ -199,7 +202,7 @@ const BulkLookup = () => {
                 disabled={loading}
                 className="px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transform hover:scale-105 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2"
               >
-                <span>📥</span>
+                <Download className="h-4 w-4" />
                 <span>Export CSV</span>
               </button>
 
@@ -208,7 +211,7 @@ const BulkLookup = () => {
                 disabled={loading}
                 className="px-6 py-3 bg-gray-800 text-gray-300 font-semibold rounded-xl hover:bg-gray-700 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2"
               >
-                <span>🗑️</span>
+                <Trash2 className="h-4 w-4" />
                 <span>Clear</span>
               </button>
             </>
@@ -221,7 +224,9 @@ const BulkLookup = () => {
         <div className="bg-gray-900/80 backdrop-blur-md p-6 rounded-2xl border border-gray-800/50 shadow-2xl">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">📊</span>
+              <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                <BarChart3 className="h-5 w-5 text-white" />
+              </div>
               <div>
                 <h3 className="text-xl font-bold text-white">Results</h3>
                 <p className="text-sm text-gray-400">
@@ -296,7 +301,9 @@ const BulkLookup = () => {
 
                         {/* Status */}
                         <td className="py-4 px-4">
-                          <span className="text-green-400 text-sm">✓ Success</span>
+                          <span className="text-green-400 text-sm flex items-center gap-1">
+                            <Check className="h-4 w-4" /> Success
+                          </span>
                         </td>
                       </>
                     ) : (
@@ -306,7 +313,9 @@ const BulkLookup = () => {
                           <span className="text-red-400 text-sm">{result.error}</span>
                         </td>
                         <td className="py-4 px-4">
-                          <span className="text-red-400 text-sm">✗ Failed</span>
+                          <span className="text-red-400 text-sm flex items-center gap-1">
+                            <X className="h-4 w-4" /> Failed
+                          </span>
                         </td>
                       </>
                     )}

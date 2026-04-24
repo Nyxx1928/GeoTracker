@@ -8,6 +8,7 @@ import LoadingState from '../components/LoadingState';
 import TransparencyPanel from '../components/TransparencyPanel';
 import { PageContainer, PageHeader } from '../components/layout';
 import { Button, Input, Card } from '../components/ui';
+import { Search, List, Trash2, MapPin, History } from 'lucide-react';
 
 export default function Home({ setIsLoggedIn }) {
   const navigate = useNavigate();
@@ -124,7 +125,7 @@ export default function Home({ setIsLoggedIn }) {
           variant={lookupMode === 'single' ? 'primary' : 'ghost'}
           size="md"
           onClick={() => setLookupMode('single')}
-          icon={<span>🔍</span>}
+          icon={<Search className="h-4 w-4" />}
           iconPosition="left"
         >
           Single Lookup
@@ -133,7 +134,7 @@ export default function Home({ setIsLoggedIn }) {
           variant={lookupMode === 'bulk' ? 'primary' : 'ghost'}
           size="md"
           onClick={() => setLookupMode('bulk')}
-          icon={<span>📋</span>}
+          icon={<List className="h-4 w-4" />}
           iconPosition="left"
         >
           Bulk Lookup
@@ -176,7 +177,7 @@ export default function Home({ setIsLoggedIn }) {
                       error={error}
                       clearable
                       onClear={() => setSearchTarget('')}
-                      icon={<span>🔍</span>}
+                      icon={<Search className="h-4 w-4" />}
                       iconPosition="left"
                     />
                   </div>
@@ -186,7 +187,7 @@ export default function Home({ setIsLoggedIn }) {
                     onClick={() => handleSearch()}
                     disabled={loading}
                     loading={loading}
-                    icon={!loading && <span>🔍</span>}
+                    icon={!loading && <Search className="h-4 w-4" />}
                     iconPosition="left"
                   >
                     {loading ? 'Searching...' : 'Search'}
@@ -196,7 +197,7 @@ export default function Home({ setIsLoggedIn }) {
                     size="md"
                     onClick={clearSearch}
                     disabled={loading}
-                    icon={<span>🗑️</span>}
+                    icon={<Trash2 className="h-4 w-4" />}
                     iconPosition="left"
                   >
                     Clear
@@ -215,7 +216,7 @@ export default function Home({ setIsLoggedIn }) {
                       }
                     }}
                     disabled={loading || !userGeo}
-                    icon={<span>📍</span>}
+                    icon={<MapPin className="h-4 w-4" />}
                     iconPosition="left"
                   >
                     What's my IP?
@@ -238,7 +239,7 @@ export default function Home({ setIsLoggedIn }) {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-brand-700 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/30">
-                    <span className="text-xl">📜</span>
+                    <History className="h-5 w-5 text-white" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-neutral-900">Search History</h3>
@@ -250,7 +251,7 @@ export default function Home({ setIsLoggedIn }) {
                     variant="danger"
                     size="sm"
                     onClick={handleDeleteSelected}
-                    icon={<span>🗑️</span>}
+                    icon={<Trash2 className="h-4 w-4" />}
                     iconPosition="left"
                   >
                     Delete Selected ({selectedHistory.length})

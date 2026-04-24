@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import Map, { Marker, NavigationControl, Popup } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import StaticMap from './StaticMap';
+import { Card } from './ui';
 
 // Free CARTO Voyager style - clean, modern, no API key needed
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
@@ -51,41 +52,69 @@ export default function GeoMap({ lat, lon }) {
   }
 
   return (
-    <div className="w-full h-64 sm:h-80 rounded-xl overflow-hidden border border-gray-200 shadow-lg shadow-cyan-900/10">
-      <Map
-        key={mapInstanceKey}
-        initialViewState={{ longitude: lon, latitude: lat, zoom: 11 }}
-        style={{ width: '100%', height: '100%' }}
-        mapStyle={MAP_STYLE}
-        onError={handleMapError}
-      >
-        <NavigationControl position="top-right" />
+    <Card variant="elevated" padding="none" className="overflow-hidden">
+      <div className="w-full h-64 sm:h-80 lg:h-96 relative">
+        <Map
+          key={mapInstanceKey}
+          initialViewState={{ longitude: lon, latitude: lat, zoom: 11 }}
+          style={{ width: '100%', height: '100%' }}
+          mapStyle={MAP_STYLE}
+          onError={handleMapError}
+        >
+          <NavigationControl position="top-right" />
 
-        <Marker longitude={lon} latitude={lat} anchor="bottom" onClick={handleMarkerClick}>
-          <div className="flex flex-col items-center cursor-pointer group">
-            <div className="w-8 h-8 bg-cyan-500 rounded-full border-2 border-white shadow-lg shadow-cyan-500/50 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <div className="w-2.5 h-2.5 bg-white rounded-full" />
+          <Marker longitude={lon} latitude={lat} anchor="bottom" onClick={handleMarkerClick}>
+            <div className="flex flex-col items-center cursor-pointer group">
+              {/* Enhanced marker with brand colors and better visual hierarchy */}
+              <div className="relative">
+                {/* Pulsing ring animation for emphasis */}
+                <div className="absolute inset-0 w-10 h-10 -top-1 -left-1 bg-brand-400 rounded-full opacity-30 animate-ping" />
+                
+                {/* Main marker pin */}
+                <div className="relative w-8 h-8 bg-gradient-to-br from-brand-400 to-brand-600 rounded-full border-2 border-white shadow-lg shadow-brand-500/50 flex items-center justify-center group-hover:scale-110 transition-all duration-200">
+                  {/* Inner dot */}
+                  <div className="w-2.5 h-2.5 bg-white rounded-full" />
+                </div>
+              </div>
+              
+              {/* Pin stem */}
+              <div className="w-0.5 h-3 bg-gradient-to-b from-brand-500 to-brand-600" />
             </div>
-            <div className="w-0.5 h-3 bg-cyan-500" />
+          </Marker>
+
+          {popupOpen && (
+            <Popup
+              longitude={lon}
+              latitude={lat}
+              anchor="top"
+              offset={[0, -52]}
+              onClose={() => setPopupOpen(false)}
+              closeOnClick={false}
+              className="rounded-lg"
+            >
+              <div className="px-3 py-2 min-w-[140px]">
+                {/* Enhanced popup with better typography and spacing */}
+                <div className="text-xs font-semibold text-neutral-700 mb-1">
+                  Location Coordinates
+                </div>
+                <div className="font-mono text-sm text-brand-600 font-medium">
+                  {lat.toFixed(4)}, {lon.toFixed(4)}
+                </div>
+              </div>
+            </Popup>
+          )}
+        </Map>
+        
+        {/* Coordinate display overlay - always visible for better UX */}
+        <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-md border border-neutral-200">
+          <div className="text-xs text-neutral-600 font-medium mb-0.5">
+            Coordinates
           </div>
-        </Marker>
-
-        {popupOpen && (
-          <Popup
-            longitude={lon}
-            latitude={lat}
-            anchor="top"
-            offset={[0, -48]}
-            onClose={() => setPopupOpen(false)}
-            closeOnClick={false}
-            className="rounded-lg"
-          >
-            <div className="px-1 py-0.5 text-xs font-mono text-gray-700">
-              {lat.toFixed(4)}, {lon.toFixed(4)}
-            </div>
-          </Popup>
-        )}
-      </Map>
-    </div>
+          <div className="font-mono text-xs text-neutral-800">
+            {lat.toFixed(4)}, {lon.toFixed(4)}
+          </div>
+        </div>
+      </div>
+    </Card>
   );
 }

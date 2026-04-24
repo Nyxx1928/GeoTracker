@@ -1,7 +1,25 @@
 import React, { useState } from 'react';
-import clsx from 'clsx';
+import { Input as ShadcnInput } from './input.jsx';
+import { cn } from '../../lib/utils';
+import { Loader2, X } from 'lucide-react';
 
-const Input = ({
+/**
+ * Enhanced Input component built on shadcn/ui primitives
+ * Supports labels, validation states, icons, loading, and clearable functionality
+ * Ensures minimum 44px height for touch targets (mobile-first)
+ * 
+ * @param {string} label - Optional label text
+ * @param {string} error - Error message to display
+ * @param {string} success - Success message to display
+ * @param {boolean} loading - Show loading spinner
+ * @param {ReactNode} icon - Icon element to display
+ * @param {string} iconPosition - Position of icon ('left' or 'right')
+ * @param {boolean} clearable - Show clear button when input has value
+ * @param {function} onClear - Callback when clear button is clicked
+ * @param {string} className - Additional classes for input element
+ * @param {string} containerClassName - Additional classes for container
+ */
+const Input = React.forwardRef(({
   label = '',
   error = '',
   success = '',
@@ -13,26 +31,8 @@ const Input = ({
   className = '',
   containerClassName = '',
   ...props
-}) => {
+}, ref) => {
   const [showClear, setShowClear] = useState(false);
-
-  const baseStyles = 'w-full px-4 py-2 rounded-lg border transition-smooth focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed';
-
-  const stateStyles = {
-    default: 'border-neutral-300 focus:border-brand-500 focus:ring-brand-500/20',
-    error: 'border-risk-danger focus:border-risk-danger focus:ring-risk-danger/20',
-    success: 'border-risk-safe focus:border-risk-safe focus:ring-risk-safe/20',
-    loading: 'border-neutral-300 focus:border-brand-500 focus:ring-brand-500/20',
-  };
-
-  const getState = () => {
-    if (error) return 'error';
-    if (success) return 'success';
-    if (loading) return 'loading';
-    return 'default';
-  };
-
-  const state = getState();
 
   const handleClear = () => {
     if (onClear) {
@@ -50,97 +50,108 @@ const Input = ({
     }
   };
 
+  // Determine input state styling
+  const inputStateClasses = cn(
+    error && 'border-destructive focus-visible:ring-destructive',
+    success && !error && 'border-green-500 focus-visible:ring-green-500'
+  );
+
+  // Calculate padding based on icons and buttons
+  const inputPaddingClasses = cn(
+    icon && iconPosition === 'left' && 'pl-10',
+    icon && iconPosition === 'right' && !clearable && !loading && 'pr-10',
+    (clearable && showClear) || loading ? 'pr-10' : ''
+  );
+
   return (
-    <div className={clsx('w-full', containerClassName)}>
+    <div className={cn('w-full', containerClassName)}>
       {label && (
-        <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+        <label 
+          htmlFor={props.id}
+          className="block text-sm font-medium text-foreground mb-1.5"
+        >
           {label}
         </label>
       )}
       
       <div className="relative">
+        {/* Left Icon */}
         {icon && iconPosition === 'left' && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
             {icon}
           </div>
         )}
         
-        <input
-          className={clsx(
-            baseStyles,
-            stateStyles[state],
-            icon && iconPosition === 'left' && 'pl-10',
-            icon && iconPosition === 'right' && 'pr-10',
-            (clearable && showClear) || loading ? 'pr-10' : '',
+        {/* Input Field - minimum 44px height for touch targets */}
+        <ShadcnInput
+          ref={ref}
+          className={cn(
+            'min-h-[44px]', // Mobile-first touch target
+            inputStateClasses,
+            inputPaddingClasses,
             className
           )}
           onChange={handleChange}
+          aria-invalid={error ? 'true' : 'false'}
+          aria-describedby={
+            error ? `${props.id}-error` : 
+            success ? `${props.id}-success` : 
+            undefined
+          }
           {...props}
         />
         
+        {/* Loading Spinner */}
         {loading && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <svg
-              className="animate-spin h-5 w-5 text-brand-600"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
           </div>
         )}
         
+        {/* Clear Button */}
         {!loading && clearable && showClear && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-smooth"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center -mr-3"
+            aria-label="Clear input"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <X className="h-4 w-4" />
           </button>
         )}
         
-        {!loading && icon && iconPosition === 'right' && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400">
+        {/* Right Icon (only when no clear button or loading) */}
+        {!loading && !clearable && icon && iconPosition === 'right' && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
             {icon}
           </div>
         )}
       </div>
       
+      {/* Error Message */}
       {error && (
-        <p className="mt-1.5 text-sm text-risk-danger">{error}</p>
+        <p 
+          id={`${props.id}-error`}
+          className="mt-1.5 text-sm text-destructive"
+          role="alert"
+        >
+          {error}
+        </p>
       )}
       
+      {/* Success Message */}
       {success && !error && (
-        <p className="mt-1.5 text-sm text-risk-safe">{success}</p>
+        <p 
+          id={`${props.id}-success`}
+          className="mt-1.5 text-sm text-green-600 dark:text-green-500"
+        >
+          {success}
+        </p>
       )}
     </div>
   );
-};
+});
+
+Input.displayName = "Input";
 
 export default Input;

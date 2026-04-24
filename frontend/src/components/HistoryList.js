@@ -3,6 +3,7 @@ import api from '../api';
 import RiskBadge from './RiskBadge';
 import CopyButton from './CopyButton';
 import { countryCodeToFlag, relativeTimestamp } from '../utils/formatters';
+import { History, Edit2, Trash2 } from 'lucide-react';
 
 /**
  * HistoryList - Displays persistent lookup history with CRUD operations.
@@ -112,7 +113,7 @@ const HistoryList = ({ onRefresh }) => {
       <div className="bg-gray-900/80 backdrop-blur-md p-6 rounded-2xl border border-gray-800/50 shadow-2xl">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/30">
-            <span className="text-xl">📜</span>
+            <History className="h-5 w-5 text-white" />
           </div>
           <div>
             <h3 className="text-xl font-bold text-white">Lookup History</h3>
@@ -131,7 +132,7 @@ const HistoryList = ({ onRefresh }) => {
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/30">
-          <span className="text-xl">📜</span>
+          <History className="h-5 w-5 text-white" />
         </div>
         <div>
           <h3 className="text-xl font-bold text-white">Lookup History</h3>
@@ -247,7 +248,7 @@ const HistoryList = ({ onRefresh }) => {
                             className="p-2 text-gray-400 hover:text-cyan-400 transition-colors"
                             title="Edit label"
                           >
-                            ✏️
+                            <Edit2 className="h-4 w-4" />
                           </button>
                           <CopyButton
                             text={getShareUrl(item.uuid)}
@@ -259,7 +260,7 @@ const HistoryList = ({ onRefresh }) => {
                             className="p-2 text-gray-400 hover:text-red-400 transition-colors"
                             title="Delete"
                           >
-                            🗑️
+                            <Trash2 className="h-4 w-4" />
                           </button>
                         </>
                       )}
