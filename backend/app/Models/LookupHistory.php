@@ -11,6 +11,13 @@ class LookupHistory extends Model
     use HasFactory;
 
     /**
+     * Explicit table name to match migration (singular)
+     *
+     * @var string
+     */
+    protected $table = 'lookup_history';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -27,17 +34,14 @@ class LookupHistory extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string,string>
      */
-    protected function casts(): array
-    {
-        return [
-            'result' => 'array',
-            'created_at' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'result' => 'array',
+        'created_at' => 'datetime',
+    ];
 
     /**
      * Boot method to auto-generate UUID v4 on creation.
