@@ -149,53 +149,51 @@ describe('ErrorDisplay Component', () => {
 
   describe('Size Variants', () => {
     it('renders small size variant', () => {
-      const { container } = render(<ErrorDisplay type="server" size="sm" />);
-      expect(container.firstChild).toHaveClass('p-4');
+      render(<ErrorDisplay type="server" size="sm" />);
+      const alert = screen.getByRole('alert');
+      expect(alert).toHaveClass('p-4');
     });
 
     it('renders medium size variant (default)', () => {
-      const { container } = render(<ErrorDisplay type="server" size="md" />);
-      expect(container.firstChild).toHaveClass('p-6');
+      render(<ErrorDisplay type="server" size="md" />);
+      const alert = screen.getByRole('alert');
+      expect(alert).toHaveClass('p-6');
     });
 
     it('renders large size variant', () => {
-      const { container } = render(<ErrorDisplay type="server" size="lg" />);
-      expect(container.firstChild).toHaveClass('p-8');
+      render(<ErrorDisplay type="server" size="lg" />);
+      const alert = screen.getByRole('alert');
+      expect(alert).toHaveClass('p-8');
     });
   });
 
   describe('Accessibility', () => {
     it('has proper ARIA role', () => {
-      const { container } = render(<ErrorDisplay type="server" />);
-      const alert = container.querySelector('[role="alert"]');
+      render(<ErrorDisplay type="server" />);
+      const alert = screen.getByRole('alert');
       expect(alert).toBeInTheDocument();
     });
 
     it('has aria-live attribute', () => {
-      const { container } = render(<ErrorDisplay type="server" />);
-      const alert = container.querySelector('[aria-live="polite"]');
-      expect(alert).toBeInTheDocument();
+      render(<ErrorDisplay type="server" />);
+      const alert = screen.getByRole('alert');
+      expect(alert).toHaveAttribute('aria-live', 'polite');
     });
   });
 
   describe('Styling', () => {
     it('applies custom className', () => {
-      const { container } = render(
-        <ErrorDisplay type="server" className="custom-class" />
-      );
-      expect(container.firstChild).toHaveClass('custom-class');
+      render(<ErrorDisplay type="server" className="custom-class" />);
+      const alert = screen.getByRole('alert');
+      expect(alert).toHaveClass('custom-class');
     });
 
     it('applies error-specific background colors', () => {
-      const { container: validationContainer } = render(
-        <ErrorDisplay type="validation" />
-      );
-      expect(validationContainer.firstChild).toHaveClass('bg-red-50');
+      render(<ErrorDisplay type="validation" />);
+      expect(screen.getByRole('alert')).toHaveClass('bg-red-50');
 
-      const { container: networkContainer } = render(
-        <ErrorDisplay type="network" />
-      );
-      expect(networkContainer.firstChild).toHaveClass('bg-red-50');
+      render(<ErrorDisplay type="network" />);
+      expect(screen.getByRole('alert')).toHaveClass('bg-red-50');
     });
   });
 });
