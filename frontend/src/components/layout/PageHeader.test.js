@@ -89,41 +89,41 @@ describe('PageHeader Component', () => {
 
   describe('Responsive Layout', () => {
     it('applies responsive flex classes', () => {
-      const { container } = render(<PageHeader />);
-      
-      const header = container.querySelector('header');
+      render(<PageHeader />);
+
+      const header = screen.getByRole('banner');
       expect(header).toHaveClass('flex', 'flex-col', 'sm:flex-row');
     });
 
     it('applies custom className', () => {
-      const { container } = render(<PageHeader className="custom-class" />);
-      
-      const header = container.querySelector('header');
+      render(<PageHeader className="custom-class" />);
+
+      const header = screen.getByRole('banner');
       expect(header).toHaveClass('custom-class');
     });
   });
 
   describe('Snapshot Tests', () => {
     it('matches snapshot for unauthenticated state', () => {
-      const { container } = render(
+      const { asFragment } = render(
         <PageHeader showAuth={true} isAuthenticated={false} />
       );
-      expect(container).toMatchSnapshot();
+      expect(asFragment()).toMatchSnapshot();
     });
 
     it('matches snapshot for authenticated state', () => {
-      const { container } = render(
+      const { asFragment } = render(
         <PageHeader isAuthenticated={true} userName="John Doe" />
       );
-      expect(container).toMatchSnapshot();
+      expect(asFragment()).toMatchSnapshot();
     });
 
     it('matches snapshot with custom actions', () => {
       const customActions = <button>Custom</button>;
-      const { container } = render(
+      const { asFragment } = render(
         <PageHeader actions={customActions} />
       );
-      expect(container).toMatchSnapshot();
+      expect(asFragment()).toMatchSnapshot();
     });
   });
 });
