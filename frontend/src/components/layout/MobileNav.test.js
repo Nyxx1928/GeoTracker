@@ -94,11 +94,9 @@ describe('MobileNav Component', () => {
     const menuButton = screen.getByLabelText('Open menu');
     fireEvent.click(menuButton);
     
-    const homeLink = screen.getByText('Home').closest('button');
-    const styles = window.getComputedStyle(homeLink);
-    
+    const homeButton = screen.getByRole('button', { name: 'Home' });
     // Check that min-height is set (Tailwind min-h-[44px])
-    expect(homeLink.className).toContain('min-h-[44px]');
+    expect(homeButton.className).toContain('min-h-[44px]');
   });
 
   describe('Snapshot Tests', () => {
