@@ -8,7 +8,6 @@ import ResultCard from '../components/ResultCard';
 import TransparencyPanel from '../components/TransparencyPanel';
 import EducationalTooltip from '../components/EducationalTooltip';
 import LoadingState from '../components/LoadingState';
-import RiskDisplay from '../components/RiskDisplay';
 import { Search, Zap, Shield, MapPin, Save, Trash2, AlertTriangle } from 'lucide-react';
 
 /**

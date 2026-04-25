@@ -54,11 +54,8 @@ describe('ThemeToggle Component', () => {
     localStorageMock.getItem.mockReturnValue(null);
     
     render(<ThemeToggle />);
-    
-    await waitFor(() => {
-      const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('aria-label', 'Switch to dark mode');
-    });
+    const button = await screen.findByRole('button');
+    expect(button).toHaveAttribute('aria-label', 'Switch to dark mode');
   });
 
   it('loads theme from localStorage if available', async () => {
@@ -80,12 +77,8 @@ describe('ThemeToggle Component', () => {
     
     render(<ThemeToggle />);
     
-    await waitFor(() => {
-      const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('aria-label', 'Switch to dark mode');
-    });
-
-    const button = screen.getByRole('button');
+    const button = await screen.findByRole('button');
+    expect(button).toHaveAttribute('aria-label', 'Switch to dark mode');
     fireEvent.click(button);
     await waitFor(() => expect(document.documentElement.classList.contains('dark')).toBe(true));
     expect(button).toHaveAttribute('aria-label', 'Switch to light mode');
@@ -99,12 +92,8 @@ describe('ThemeToggle Component', () => {
     
     render(<ThemeToggle />);
     
-    await waitFor(() => {
-      const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('aria-label', 'Switch to light mode');
-    });
-
-    const button = screen.getByRole('button');
+    const button = await screen.findByRole('button');
+    expect(button).toHaveAttribute('aria-label', 'Switch to light mode');
     fireEvent.click(button);
     await waitFor(() => expect(document.documentElement.classList.contains('dark')).toBe(false));
     expect(button).toHaveAttribute('aria-label', 'Switch to dark mode');
@@ -118,12 +107,7 @@ describe('ThemeToggle Component', () => {
     
     render(<ThemeToggle />);
     
-    await waitFor(() => {
-      const button = screen.getByRole('button');
-      expect(button).toBeInTheDocument();
-    });
-    
-    const button = screen.getByRole('button');
+    const button = await screen.findByRole('button');
     fireEvent.click(button);
 
     await waitFor(() => {
@@ -199,11 +183,8 @@ describe('ThemeToggle Component', () => {
 
   it('has proper accessibility attributes', async () => {
     render(<ThemeToggle />);
-    
-    await waitFor(() => {
-      const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('aria-label');
-      expect(button.getAttribute('aria-label')).toMatch(/Switch to (light|dark) mode/);
-    });
+    const button = await screen.findByRole('button');
+    expect(button).toHaveAttribute('aria-label');
+    expect(button.getAttribute('aria-label')).toMatch(/Switch to (light|dark) mode/);
   });
 });

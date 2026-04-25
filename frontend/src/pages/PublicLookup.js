@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ResultCard from '../components/ResultCard';
 import LoadingState from '../components/LoadingState';
 import { PageContainer, PageHeader } from '../components/layout';
-import { Input, Button, Card } from '../components/ui';
+import { Button, Card } from '../components/ui';
 
 /**
  * PublicLookup - Public page for viewing shared lookup results.
@@ -30,11 +30,7 @@ const PublicLookup = () => {
   const [error, setError] = useState('');
   const [loadingStep, setLoadingStep] = useState(0);
 
-  useEffect(() => {
-    fetchLookup();
-  }, [uuid]);
-
-  const fetchLookup = async () => {
+  const fetchLookup = useCallback(async () => {
     setLoading(true);
     setError('');
     setLoadingStep(0);
@@ -78,7 +74,11 @@ const PublicLookup = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [uuid]);
+
+  useEffect(() => {
+    fetchLookup();
+  }, [fetchLookup]);
 
   const loadingSteps = [
     'Connecting to server',
